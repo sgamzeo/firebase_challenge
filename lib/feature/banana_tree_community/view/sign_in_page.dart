@@ -1,17 +1,31 @@
-import 'package:firebase_challenge/core/components/custom_button.dart';
 import 'package:firebase_challenge/core/components/custom_text_button.dart';
+import 'package:firebase_challenge/core/components/custom_form.dart';
 import 'package:firebase_challenge/core/components/custom_text_field.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
+import 'package:firebase_challenge/core/helpers/validator_helper.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
-  final List<FieldType> fields = const [FieldType.email, FieldType.password];
-
   @override
   Widget build(BuildContext context) {
+    final fields = [
+      FormFieldData(
+        fieldType: FieldType.email,
+        label: 'Email',
+        hint: 'example@domain.com',
+        validatorType: ValidatorType.email,
+      ),
+      FormFieldData(
+        fieldType: FieldType.password,
+        label: 'Password',
+        hint: 'Enter your password',
+        validatorType: ValidatorType.password,
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(title: const Text('Sign In'), centerTitle: true),
       body: Padding(
@@ -19,19 +33,13 @@ class SignInPage extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: ListView.separated(
-                itemCount: fields.length,
-                separatorBuilder: (_, __) =>
-                    SizedBox(height: Dimens.spaceMedium),
-                itemBuilder: (context, index) {
-                  return CustomTextField(fieldType: fields[index]);
+              child: CustomForm(
+                fields: fields,
+                onSubmit: () {
+                  // Sign in logic buraya gelecek
                 },
+                submitText: 'Sign In',
               ),
-            ),
-            SizedBox(height: Dimens.spaceLarge),
-            SizedBox(
-              width: double.infinity,
-              child: CustomButton(text: 'Sign In', onPressed: () {}),
             ),
             SizedBox(height: Dimens.spaceMedium),
             Row(

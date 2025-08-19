@@ -1,4 +1,4 @@
-import 'package:firebase_challenge/core/components/custom_button.dart';
+import 'package:firebase_challenge/core/components/custom_form.dart';
 import 'package:firebase_challenge/core/components/custom_text_button.dart';
 import 'package:firebase_challenge/core/components/custom_text_field.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
@@ -7,15 +7,15 @@ import 'package:flutter/material.dart';
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
-  final List<FieldType> fields = const [
-    FieldType.normal, // Name
-    FieldType.email,
-    FieldType.password,
-    FieldType.phone, // opsiyonel
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final fields = [
+      FormFieldData(fieldType: FieldType.normal, label: 'Full Name'),
+      FormFieldData(fieldType: FieldType.email),
+      FormFieldData(fieldType: FieldType.password),
+      FormFieldData(fieldType: FieldType.phone),
+    ];
+
     return Scaffold(
       appBar: AppBar(title: const Text('Sign Up'), centerTitle: true),
       body: Padding(
@@ -23,19 +23,11 @@ class SignUpPage extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: ListView.separated(
-                itemCount: fields.length,
-                separatorBuilder: (_, __) =>
-                    SizedBox(height: Dimens.spaceMedium),
-                itemBuilder: (context, index) {
-                  return CustomTextField(fieldType: fields[index]);
-                },
+              child: CustomForm(
+                fields: fields,
+                onSubmit: () {},
+                submitText: 'Sign Up',
               ),
-            ),
-            SizedBox(height: Dimens.spaceLarge),
-            SizedBox(
-              width: double.infinity,
-              child: CustomButton(text: 'Sign Up', onPressed: () {}),
             ),
             SizedBox(height: Dimens.spaceMedium),
             Row(
