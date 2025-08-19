@@ -1,3 +1,8 @@
+import 'package:firebase_challenge/core/components/custom_button.dart';
+import 'package:firebase_challenge/core/components/custom_text_button.dart';
+import 'package:firebase_challenge/core/components/custom_text_field.dart';
+import 'package:firebase_challenge/core/constants/dimens.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/view/sign_in_page.dart';
 import 'package:flutter/material.dart';
 
 class BananaTreeCommunityPage extends StatelessWidget {
@@ -5,9 +10,6 @@ class BananaTreeCommunityPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Test')),
-      body: const Center(child: Text('Test')),
-    );
+    return Scaffold(body: SignInPage());
   }
 }
