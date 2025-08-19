@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 enum FieldType { email, password, phone, normal }
 
 class CustomTextField extends StatelessWidget {
+  final FocusNode? focusNode;
   final String? labelText;
   final String? hintText;
   final FieldType fieldType;
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
 
   const CustomTextField({
     super.key,
+    this.focusNode,
     this.labelText,
     this.hintText,
     this.fieldType = FieldType.normal,
@@ -25,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.autofocus = false,
     this.obscureText = false,
     this.onToggle,
+    required validatorType,
   });
 
   @override
@@ -50,13 +53,14 @@ class CustomTextField extends StatelessWidget {
         defaultKeyboard = TextInputType.phone;
         break;
       case FieldType.normal:
-        defaultLabel = '';
-        defaultHint = '';
+        defaultLabel = labelText ?? '';
+        defaultHint = hintText ?? '';
         defaultKeyboard = TextInputType.text;
         break;
     }
 
     return TextField(
+      focusNode: focusNode,
       controller: controller,
       obscureText: fieldType == FieldType.password ? obscureText : false,
       keyboardType: keyboardType ?? defaultKeyboard,
