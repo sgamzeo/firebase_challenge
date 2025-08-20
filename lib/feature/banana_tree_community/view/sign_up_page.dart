@@ -1,8 +1,9 @@
-import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
-import 'package:firebase_challenge/core/components/forms/form_field_data.dart';
-import 'package:firebase_challenge/core/helpers/api_error_halper.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/cubit/sign_up_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_challenge/core/components/custom_form.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
+import 'package:firebase_challenge/core/components/forms/custom_form.dart';
+import 'package:firebase_challenge/core/components/forms/form_field_data.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/helpers/validator_helper.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
@@ -15,7 +16,6 @@ class SignUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Dimens.init(context);
     final authService = FirebaseAuthService();
-    final formState = FormStateManager();
 
     final fields = [
       FormFieldData(
@@ -48,47 +48,60 @@ class SignUpPage extends StatelessWidget {
       ),
     ];
 
-    Future<void> _handleSubmit(Map<String, dynamic> values) async {
-      final email = values['email'] as String;
-      final password = values['password'] as String;
+    return BlocProvider(
+      create: (_) => SignUpCubit(authService),
+      child: BlocBuilder<SignUpCubit, SignUpState>(
+        builder: (context, state) {
+          Future<void> _handleSubmit(Map<String, dynamic> values) async {
+            final name = values['name'] as String;
+            final email = values['email'] as String;
+            final password = values['password'] as String;
 
-      try {
-        await authService.createUser(email: email, password: password);
-        Navigator.pushReplacementNamed(context, AppRoutes.chasingLegends);
-      } catch (e) {
-        formState.setApiError(ApiErrorHandler.getErrorMessage(e));
-      }
-    }
+            await context.read<SignUpCubit>().signUp(
+              context,
+              name,
+              email,
+              password,
+            );
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up'), centerTitle: true),
-      body: Padding(
-        padding: Dimens.pagePaddingMedium,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomForm(
-                fields: fields,
-                onSubmit: _handleSubmit,
-                submitText: 'Sign Up',
-                formState: formState,
+            if (context.read<SignUpCubit>().state.apiError == null) {
+              Navigator.pushReplacementNamed(context, AppRoutes.chasingLegends);
+            }
+          }
+
+          return Scaffold(
+            appBar: AppBar(title: const Text('Sign Up'), centerTitle: true),
+            body: Padding(
+              padding: Dimens.pagePaddingMedium,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomForm(
+                      fields: fields,
+                      onSubmit: _handleSubmit,
+                      submitText: 'Sign Up',
+                      formState: FormStateManager(),
+                    ),
+
+                    SizedBox(height: Dimens.spaceMedium),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?"),
+                        CustomTextButton(
+                          text: 'Sign In',
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: Dimens.spaceMedium),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Already have an account?"),
-                  CustomTextButton(
-                    text: 'Sign In',
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

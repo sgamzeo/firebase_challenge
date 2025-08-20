@@ -2,7 +2,7 @@ import 'package:firebase_challenge/core/components/buttons/custom_button.dart';
 import 'package:firebase_challenge/core/components/forms/custom_text_field.dart';
 import 'package:firebase_challenge/core/components/forms/form_field_data.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
-import 'package:firebase_challenge/core/helpers/api_error_halper.dart';
+import 'package:firebase_challenge/core/helpers/api_error_helper.dart';
 import 'package:firebase_challenge/core/helpers/validator_helper.dart';
 import 'package:flutter/material.dart';
 
