@@ -1,26 +1,40 @@
-import 'package:firebase_challenge/core/extensions/regex_extensions.dart';
+enum FieldType { email, password, phone, normal }
 
-enum ValidatorType { email, password, phone, creditCard, turkishId, url, none }
+enum ValidatorType { none, email, password, phone, required }
 
+// client side
 class ValidatorHelper {
-  static String? validate(String? value, ValidatorType type) {
-    if (value == null || value.isEmpty) return 'This field is required';
+  static String? validate(String value, ValidatorType type) {
+    if (value.isEmpty) {
+      return 'This field is required';
+    }
 
     switch (type) {
       case ValidatorType.email:
-        return value.isEmail ? null : 'Invalid email';
+        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+        if (!emailRegex.hasMatch(value)) {
+          return 'Please enter a valid email address';
+        }
+        break;
       case ValidatorType.password:
-        return value.isStrongPassword ? null : 'Weak password';
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+        break;
       case ValidatorType.phone:
-        return value.isTurkishPhone ? null : 'Invalid phone';
-      case ValidatorType.creditCard:
-        return value.isCreditCard ? null : 'Invalid credit card';
-      case ValidatorType.turkishId:
-        return value.isTurkishId ? null : 'Invalid ID';
-      case ValidatorType.url:
-        return value.isUrl ? null : 'Invalid URL';
+        final phoneRegex = RegExp(r'^[0-9]{10,15}$');
+        if (!phoneRegex.hasMatch(value)) {
+          return 'Please enter a valid phone number';
+        }
+        break;
+      case ValidatorType.required:
+        if (value.isEmpty) {
+          return 'This field is required';
+        }
+        break;
       case ValidatorType.none:
-        return null;
+        break;
     }
+    return null;
   }
 }
