@@ -26,10 +26,10 @@ class SignUpCubit extends Cubit<SignUpState> {
         email: email,
         password: password,
       );
-      AppLogger.i('SignUp success: $email');
+      AppLogger.i('Sign up success: $email');
       emit(state.copyWith(isSubmitting: false));
     } catch (e, st) {
-      AppLogger.e('SignUp failed', e, st);
+      AppLogger.e('Sign up failed', e, st);
       emit(state.copyWith(isSubmitting: false, apiError: e.toString()));
 
       // Hata dialogu burada
