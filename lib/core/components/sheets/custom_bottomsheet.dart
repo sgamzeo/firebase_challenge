@@ -1,6 +1,6 @@
+import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../constants/dimens.dart';
 
 class CustomBottomSheet extends StatelessWidget {
   final String title;

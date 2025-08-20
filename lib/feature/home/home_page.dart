@@ -1,5 +1,4 @@
-import 'package:firebase_challenge/core/components/custom_button.dart';
-import 'package:firebase_challenge/core/constants/colors.dart';
+import 'package:firebase_challenge/core/components/buttons/custom_button.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
 import 'package:flutter/material.dart';
 

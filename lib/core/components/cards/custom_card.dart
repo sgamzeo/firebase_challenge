@@ -1,6 +1,5 @@
+import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:flutter/material.dart';
-
-import '../constants/dimens.dart';
 
 class CustomCard extends StatelessWidget {
   final Widget? child;

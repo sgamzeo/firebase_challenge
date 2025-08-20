@@ -1,6 +1,5 @@
+import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:flutter/material.dart';
-
-import '../constants/dimens.dart';
 
 class FilterOptionsList extends StatelessWidget {
   final List<Map<String, dynamic>> options;

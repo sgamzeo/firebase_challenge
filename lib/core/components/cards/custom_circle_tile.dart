@@ -1,8 +1,7 @@
-import 'package:firebase_challenge/core/components/custom_cached_image.dart';
+import 'package:firebase_challenge/core/components/placeholders/custom_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../constants/dimens.dart';
+import 'package:firebase_challenge/core/constants/dimens.dart';
 
 class CustomCircleTile extends StatelessWidget {
   final String imageUrl;

@@ -1,8 +1,9 @@
-import 'package:firebase_challenge/core/components/form_field_data.dart';
+import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
+import 'package:firebase_challenge/core/components/forms/form_field_data.dart';
 import 'package:firebase_challenge/core/helpers/api_error_halper.dart';
+import 'package:firebase_challenge/core/helpers/form_state_manager.dart'
+    hide FormStateManager;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_challenge/core/components/custom_text_button.dart';
 import 'package:firebase_challenge/core/components/custom_form.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/helpers/validator_helper.dart';

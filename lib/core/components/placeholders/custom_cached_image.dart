@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_challenge/core/components/no_image_placeholder.dart';
+import 'package:firebase_challenge/core/components/placeholders/no_image_placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
