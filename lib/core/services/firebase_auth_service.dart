@@ -1,98 +1,66 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_challenge/core/services/token_manager.dart';
-import 'package:flutter/material.dart';
+import 'package:firebase_challenge/core/logger/app_logger.dart';
 
-//TODO: token control
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TokenManager _tokenManager = TokenManager();
 
-  Future<UserCredential?> createUser({
+  // firebase_auth_service.dart
+  Future<UserCredential> createUser({
     required String email,
     required String password,
-    required BuildContext context,
   }) async {
+    AppLogger.d('Creating user with email: $email');
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      final token = await credential.user?.getIdToken();
-      if (token != null) {
-        await _tokenManager.saveToken(token);
-      }
-
+      AppLogger.i('User created successfully: $email');
       return credential;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_getFirebaseAuthMessage(e));
-    } catch (e) {
-      throw Exception('Unexpected error: $e');
+    } catch (e, stackTrace) {
+      AppLogger.e('User creation failed for email: $email', e, stackTrace);
+      rethrow;
     }
   }
 
-  Future<UserCredential?> signIn({
+  Future<UserCredential> signIn({
     required String email,
     required String password,
-    required BuildContext context,
   }) async {
+    AppLogger.d('Signing in user: $email');
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      final token = await credential.user?.getIdToken();
-      if (token != null) {
-        await _tokenManager.saveToken(token);
-      }
-
+      AppLogger.i('User signed in successfully: $email');
       return credential;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_getFirebaseAuthMessage(e));
-    } catch (e) {
-      throw Exception('Unexpected error: $e');
+    } catch (e, stackTrace) {
+      AppLogger.e('Sign in failed for email: $email', e, stackTrace);
+      rethrow;
     }
   }
 
-  User? get currentUser => _auth.currentUser;
-
-  Future<String?> getIdToken({bool refresh = false}) async {
-    final user = _auth.currentUser;
-    if (user == null) return null;
-    return await user.getIdToken(refresh);
-  }
-
-  Map<String, dynamic>? getCurrentUserProfile() {
-    final user = _auth.currentUser;
-    if (user == null) return null;
-
-    return {
-      'uid': user.uid,
-      'displayName': user.displayName,
-      'email': user.email,
-      'photoURL': user.photoURL,
-      'phoneNumber': user.phoneNumber,
-    };
+  Future<String?> getToken() async {
+    AppLogger.d('Getting token from Firebase');
+    try {
+      final token = await _auth.currentUser?.getIdToken();
+      AppLogger.d('Token ${token != null ? "received" : "is null"}');
+      return token;
+    } catch (e, stackTrace) {
+      AppLogger.e('Token retrieval failed', e, stackTrace);
+      return null;
+    }
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
-    await _tokenManager.clearToken();
-  }
-
-  String _getFirebaseAuthMessage(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'email-already-in-use':
-        return 'The account already exists for that email.';
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided for that user.';
-      default:
-        return e.message ?? 'FirebaseAuth error';
+    AppLogger.d('Signing out user');
+    try {
+      await _auth.signOut();
+      AppLogger.i('User signed out successfully');
+    } catch (e, stackTrace) {
+      AppLogger.e('Sign out failed', e, stackTrace);
+      rethrow;
     }
   }
 }

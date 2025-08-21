@@ -1,4 +1,3 @@
-import 'package:firebase_challenge/feature/banana_tree_community/cubit/sign_up_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
@@ -8,6 +7,7 @@ import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/helpers/validator_helper.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
 import 'package:firebase_challenge/core/services/firebase_auth_service.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/cubit/sign_up_cubit.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -39,18 +39,37 @@ class SignUpPage extends StatelessWidget {
         hint: 'Enter your password',
         validatorType: ValidatorType.password,
       ),
-      FormFieldData(
-        key: 'phone',
-        fieldType: FieldType.phone,
-        label: 'Phone',
-        hint: '1234567890',
-        validatorType: ValidatorType.phone,
-      ),
     ];
 
     return BlocProvider(
       create: (_) => SignUpCubit(authService),
-      child: BlocBuilder<SignUpCubit, SignUpState>(
+      child: BlocConsumer<SignUpCubit, SignUpState>(
+        listener: (context, state) {
+          // navigate to home if signup successful
+          if (!state.isSubmitting && state.apiError == null) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.chasingLegends, // home page route
+            );
+          }
+
+          // show error dialog if there is an API error
+          if (state.apiError != null) {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: const Text('Error'),
+                content: Text(state.apiError!),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
         builder: (context, state) {
           Future<void> _handleSubmit(Map<String, dynamic> values) async {
             final name = values['name'] as String;
@@ -58,15 +77,10 @@ class SignUpPage extends StatelessWidget {
             final password = values['password'] as String;
 
             await context.read<SignUpCubit>().signUp(
-              context,
-              name,
-              email,
-              password,
+              name: name,
+              email: email,
+              password: password,
             );
-
-            if (context.read<SignUpCubit>().state.apiError == null) {
-              Navigator.pushReplacementNamed(context, AppRoutes.chasingLegends);
-            }
           }
 
           return Scaffold(
@@ -79,10 +93,11 @@ class SignUpPage extends StatelessWidget {
                     CustomForm(
                       fields: fields,
                       onSubmit: _handleSubmit,
-                      submitText: 'Sign Up',
+                      submitText: state.isSubmitting
+                          ? 'Signing Up...'
+                          : 'Sign Up',
                       formState: FormStateManager(),
                     ),
-
                     SizedBox(height: Dimens.spaceMedium),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,49 +1,31 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_challenge/core/logger/app_logger.dart';
 import 'package:firebase_challenge/core/services/firebase_auth_service.dart';
-import 'package:flutter/material.dart';
 
 part 'sign_in_state.dart';
 
 class SignInCubit extends Cubit<SignInState> {
   final FirebaseAuthService authService;
 
-  SignInCubit(this.authService) : super(const SignInState());
+  SignInCubit({required this.authService}) : super(const SignInState());
 
-  Future<void> signIn(
-    BuildContext context,
-    String email,
-    String password,
-  ) async {
-    AppLogger.i('SignIn attempt: $email');
+  // sign_in_cubit.dart
+  Future<void> signIn({required String email, required String password}) async {
     emit(state.copyWith(isSubmitting: true, apiError: null));
+    AppLogger.i('Sign in attempt for email: $email');
 
     try {
-      await authService.signIn(
-        context: context,
-        email: email,
-        password: password,
-      );
-      AppLogger.i('Sign in success: $email');
-      emit(state.copyWith(isSubmitting: false));
-    } catch (e, st) {
-      AppLogger.e('Sign in failed', e, st);
+      await authService.signIn(email: email, password: password);
+      AppLogger.i('Sign in successful for email: $email');
+      emit(state.copyWith(isSubmitting: false, isSuccess: true));
+    } on FirebaseAuthException catch (e, stackTrace) {
+      AppLogger.e('Sign in failed for email: $email', e, stackTrace);
+      emit(state.copyWith(isSubmitting: false, apiError: e.message));
+    } catch (e, stackTrace) {
+      AppLogger.e('Unexpected sign in error for email: $email', e, stackTrace);
       emit(state.copyWith(isSubmitting: false, apiError: e.toString()));
-
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Error'),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
     }
   }
 }

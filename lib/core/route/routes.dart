@@ -7,10 +7,15 @@ import 'package:firebase_challenge/feature/eurovision_remote_config/view/eurovis
 import 'package:firebase_challenge/feature/fcm_beacon_challenge/view/fcm_beacon_challenge_page.dart';
 import 'package:firebase_challenge/feature/home/home_page.dart';
 import 'package:firebase_challenge/feature/martian_crashlytics_challenge/view/martian_crashlytics_challenge_page.dart';
+import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
   static const String initialRoute = '/';
+  static const String home = '/home';
+  //TODO: signIn signUp will be uploaded as subView of auth
+  static const String signIn = '/signIn';
+  static const String signUp = '/signUp';
   static const String bananaTree = '/banana_tree';
   static const String bananaTreeSignIn = '/banana_tree/signIn';
   static const String bananaTreeSignUp = '/banana_tree/signUp';
@@ -21,7 +26,11 @@ class AppRoutes {
   static const String martianCrashlytics = '/martian_crashlytics';
 
   static Map<String, WidgetBuilder> get all => {
-    initialRoute: (context) => HomePage(),
+    initialRoute: (context) => SplashPage(),
+    home: (context) => HomePage(),
+    signIn: (context) => SignInPage(),
+    signUp: (context) => SignUpPage(),
+
     bananaTree: (context) => BananaTreeCommunityPage(),
     bananaTreeSignIn: (context) => SignInPage(),
     bananaTreeSignUp: (context) => SignUpPage(),
