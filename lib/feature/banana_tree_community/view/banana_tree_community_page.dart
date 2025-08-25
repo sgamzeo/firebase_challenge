@@ -1,4 +1,4 @@
-import 'package:firebase_challenge/feature/banana_tree_community/view/sign_in_page.dart';
+import 'package:firebase_challenge/feature/auth/auth_page.dart';
 import 'package:flutter/material.dart';
 
 class BananaTreeCommunityPage extends StatelessWidget {
@@ -6,6 +6,6 @@ class BananaTreeCommunityPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SignInPage());
+    return Scaffold(body: AuthPage());
   }
 }

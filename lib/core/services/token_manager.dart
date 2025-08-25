@@ -1,12 +1,14 @@
+// lib/core/services/token_manager.dart
 import 'package:firebase_challenge/core/logger/app_logger.dart';
 import 'package:get_storage/get_storage.dart';
 
 class TokenManager {
-  static final GetStorage _storage = GetStorage();
+  final GetStorage _storage;
   static const _key = 'idToken';
 
-  // token_manager.dart
-  static Future<void> saveToken(String token) async {
+  TokenManager(this._storage);
+
+  Future<void> saveToken(String token) async {
     AppLogger.d('Saving token to storage');
     try {
       await _storage.write(_key, token);
@@ -17,7 +19,7 @@ class TokenManager {
     }
   }
 
-  static String? getToken() {
+  String? getToken() {
     AppLogger.d('Retrieving token from storage');
     try {
       final token = _storage.read(_key);
@@ -29,7 +31,7 @@ class TokenManager {
     }
   }
 
-  static Future<void> clearToken() async {
+  Future<void> clearToken() async {
     AppLogger.d('Clearing token from storage');
     try {
       await _storage.remove(_key);

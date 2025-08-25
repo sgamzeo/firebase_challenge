@@ -1,3 +1,6 @@
+import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
+    as di;
+import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
@@ -6,18 +9,23 @@ import 'package:firebase_challenge/core/components/forms/form_field_data.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/helpers/validator_helper.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
-import 'package:firebase_challenge/core/services/firebase_auth_service.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/cubit/sign_in_cubit.dart';
+import 'package:firebase_challenge/feature/auth/cubit/sign_up_cubit.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     Dimens.init(context);
-    final authService = FirebaseAuthService();
 
     final fields = [
+      FormFieldData(
+        key: 'name',
+        fieldType: FieldType.normal,
+        label: 'Full Name',
+        hint: 'Enter your full name',
+        validatorType: ValidatorType.required,
+      ),
       FormFieldData(
         key: 'email',
         fieldType: FieldType.email,
@@ -35,18 +43,13 @@ class SignInPage extends StatelessWidget {
     ];
 
     return BlocProvider(
-      create: (_) => SignInCubit(authService: authService),
-      child: BlocConsumer<SignInCubit, SignInState>(
+      create: (_) => SignUpCubit(signUpUseCase: di.getIt<SignUpUseCase>()),
+      child: BlocConsumer<SignUpCubit, SignUpState>(
         listener: (context, state) {
-          // navigate if sign in successful
-          if (state.isSuccess) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.martianCrashlytics, // Home page route
-            );
+          if (!state.isSubmitting && state.apiError == null) {
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
           }
 
-          // show error dialog if sign in failed
           if (state.apiError != null) {
             showDialog(
               context: context,
@@ -64,51 +67,48 @@ class SignInPage extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          final formState = FormStateManager();
-
           Future<void> _handleSubmit(Map<String, dynamic> values) async {
+            final name = values['name'] as String;
             final email = values['email'] as String;
             final password = values['password'] as String;
 
-            await context.read<SignInCubit>().signIn(
+            await context.read<SignUpCubit>().signUp(
+              name: name,
               email: email,
               password: password,
             );
           }
 
           return Scaffold(
-            appBar: AppBar(title: const Text('Sign In'), centerTitle: true),
+            appBar: AppBar(title: const Text('Sign Up'), centerTitle: true),
             body: Padding(
               padding: Dimens.pagePaddingMedium,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CustomForm(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomForm(
                       fields: fields,
                       onSubmit: _handleSubmit,
                       submitText: state.isSubmitting
-                          ? 'Signing In...'
-                          : 'Sign In',
-                      formState: formState,
+                          ? 'Signing Up...'
+                          : 'Sign Up',
+                      formState: FormStateManager(),
                     ),
-                  ),
-                  SizedBox(height: Dimens.spaceMedium),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account?"),
-                      CustomTextButton(
-                        text: 'Sign Up',
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.bananaTreeSignUp,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                    SizedBox(height: Dimens.spaceMedium),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?"),
+                        CustomTextButton(
+                          text: 'Sign In',
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );

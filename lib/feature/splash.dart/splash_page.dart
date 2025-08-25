@@ -1,35 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/cubit/auth_cubit.dart';
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
-    //check auth status
-    context.read<AuthCubit>().checkAuth();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthCubit>().checkAuth();
+    });
+
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        //routing
         if (state is AuthAuthenticated) {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else if (state is AuthUnauthenticated) {
-          Navigator.pushReplacementNamed(context, AppRoutes.bananaTree);
+          Navigator.pushReplacementNamed(context, AppRoutes.auth);
         }
       },
-      child: Scaffold(body: Center(child: CircularProgressIndicator())),
+      child: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }

@@ -1,4 +1,6 @@
 // main.dart
+import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
+    as di;
 import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,24 +10,17 @@ import 'package:firebase_challenge/core/route/router.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/theme/theme_extensions.dart';
 import 'package:firebase_challenge/firebase_options.dart';
-import 'package:firebase_challenge/core/services/firebase_auth_service.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/cubit/auth_cubit.dart';
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
+import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<FirebaseAuthService>(
-          create: (_) => FirebaseAuthService(),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  di.setupDependencies(); // Dependency injection'ı kur
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -37,7 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthCubit>(
           create: (context) =>
-              AuthCubit(authService: context.read<FirebaseAuthService>()),
+              AuthCubit(authRepository: di.getIt<AuthRepository>()),
         ),
       ],
       child: MaterialApp(

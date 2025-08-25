@@ -4,7 +4,6 @@ import 'package:firebase_challenge/core/logger/app_logger.dart';
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // firebase_auth_service.dart
   Future<UserCredential> createUser({
     required String email,
     required String password,

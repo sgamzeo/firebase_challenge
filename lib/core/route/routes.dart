@@ -1,6 +1,7 @@
+import 'package:firebase_challenge/feature/auth/auth_page.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/view/banana_tree_community_page.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/view/sign_in_page.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/view/sign_up_page.dart';
+import 'package:firebase_challenge/feature/auth/view/sign_in_page.dart';
+import 'package:firebase_challenge/feature/auth/view/sign_up_page.dart';
 import 'package:firebase_challenge/feature/chasing_legends/view/chasing_legends_page.dart';
 import 'package:firebase_challenge/feature/daring_duck_auth/view/daring_duck_auth_page.dart';
 import 'package:firebase_challenge/feature/eurovision_remote_config/view/eurovision_remote_config_page.dart';
@@ -14,11 +15,12 @@ class AppRoutes {
   static const String initialRoute = '/';
   static const String home = '/home';
   //TODO: signIn signUp will be uploaded as subView of auth
-  static const String signIn = '/signIn';
-  static const String signUp = '/signUp';
+
   static const String bananaTree = '/banana_tree';
-  static const String bananaTreeSignIn = '/banana_tree/signIn';
-  static const String bananaTreeSignUp = '/banana_tree/signUp';
+  static const String auth = '/auth';
+
+  static const String signIn = '/auth/signIn';
+  static const String signUp = '/auth/signUp';
   static const String chasingLegends = '/chasing_legends';
   static const String daringDuck = '/daring_duck';
   static const String eurovision = '/eurovision';
@@ -28,12 +30,10 @@ class AppRoutes {
   static Map<String, WidgetBuilder> get all => {
     initialRoute: (context) => SplashPage(),
     home: (context) => HomePage(),
+    auth: (context) => AuthPage(),
     signIn: (context) => SignInPage(),
     signUp: (context) => SignUpPage(),
-
     bananaTree: (context) => BananaTreeCommunityPage(),
-    bananaTreeSignIn: (context) => SignInPage(),
-    bananaTreeSignUp: (context) => SignUpPage(),
     chasingLegends: (context) => ChasingLegendsPage(),
     daringDuck: (context) => DaringDuckAuthPage(),
     eurovision: (context) => EurovisionRemoteConfigPage(),
