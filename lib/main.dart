@@ -18,7 +18,7 @@ void main() async {
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  di.setupDependencies(); // Dependency injection'ı kur
+  di.setupDependencies();
 
   runApp(const MyApp());
 }

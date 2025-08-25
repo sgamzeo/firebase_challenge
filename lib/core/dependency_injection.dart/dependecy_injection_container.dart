@@ -3,7 +3,6 @@ import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:firebase_challenge/core/services/firebase_auth_service.dart';
 import 'package:firebase_challenge/core/services/token_manager.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
 
@@ -14,15 +13,11 @@ void setupDependencies() {
   getIt.registerSingleton<GetStorage>(GetStorage());
 
   // Services
-  getIt.registerSingleton<FirebaseAuthService>(FirebaseAuthService());
   getIt.registerSingleton<TokenManager>(TokenManager(getIt<GetStorage>()));
 
   // Repositories
   getIt.registerSingleton<AuthRepository>(
-    AuthRepositoryImpl(
-      authService: getIt<FirebaseAuthService>(),
-      tokenManager: getIt<TokenManager>(),
-    ),
+    AuthRepositoryImpl(tokenManager: getIt<TokenManager>()),
   );
 
   // Use Cases
