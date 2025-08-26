@@ -22,7 +22,17 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Home Page")),
+      appBar: AppBar(
+        title: const Text("Home Page"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle, size: Dimens.spaceXLarge),
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.profile);
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: ListView.separated(
           shrinkWrap: true,

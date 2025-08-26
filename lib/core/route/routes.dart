@@ -1,4 +1,5 @@
-import 'package:firebase_challenge/feature/auth/auth_page.dart';
+import 'package:firebase_challenge/feature/auth/view/auth_page.dart';
+import 'package:firebase_challenge/feature/auth/view/profile_page.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/view/banana_tree_community_page.dart';
 import 'package:firebase_challenge/feature/auth/view/sign_in_page.dart';
 import 'package:firebase_challenge/feature/auth/view/sign_up_page.dart';
@@ -14,13 +15,11 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   static const String initialRoute = '/';
   static const String home = '/home';
-  //TODO: signIn signUp will be uploaded as subView of auth
-
   static const String bananaTree = '/banana_tree';
   static const String auth = '/auth';
-
   static const String signIn = '/auth/signIn';
   static const String signUp = '/auth/signUp';
+  static const String profile = '/auth/profile';
   static const String chasingLegends = '/chasing_legends';
   static const String daringDuck = '/daring_duck';
   static const String eurovision = '/eurovision';
@@ -33,6 +32,7 @@ class AppRoutes {
     auth: (context) => AuthPage(),
     signIn: (context) => SignInPage(),
     signUp: (context) => SignUpPage(),
+    profile: (context) => ProfilePage(),
     bananaTree: (context) => BananaTreeCommunityPage(),
     chasingLegends: (context) => ChasingLegendsPage(),
     daringDuck: (context) => DaringDuckAuthPage(),

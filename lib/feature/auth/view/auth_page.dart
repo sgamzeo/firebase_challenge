@@ -1,4 +1,5 @@
 import 'package:firebase_challenge/core/components/buttons/custom_button.dart';
+import 'package:firebase_challenge/core/components/buttons/custom_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/route/routes.dart';
@@ -15,12 +16,6 @@ class AuthPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome to Our App!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: Dimens.spaceXLarge),
             SizedBox(
               width: double.infinity,
               child: CustomButton(
@@ -40,6 +35,15 @@ class AuthPage extends StatelessWidget {
                 },
                 text: 'Sign Up',
               ),
+            ),
+
+            SizedBox(height: Dimens.spaceMedium),
+
+            CustomTextButton(
+              text: 'Proceed as Guest',
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.home);
+              },
             ),
           ],
         ),
