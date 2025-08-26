@@ -2,9 +2,11 @@ import 'package:firebase_challenge/core/components/placeholders/custom_cached_im
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomCircleTile extends StatelessWidget {
-  final String imageUrl;
+  final String imageUrl; // PNG/Network URL veya SVG asset path
+  final bool isSvg;
   final String title;
   final String description;
   final double? size;
@@ -13,10 +15,12 @@ class CustomCircleTile extends StatelessWidget {
   final TextStyle? descriptionStyle;
   final double? spacing;
   final Widget? placeholder;
+  final Widget? child;
 
   const CustomCircleTile({
     super.key,
     required this.imageUrl,
+    this.isSvg = false,
     required this.title,
     required this.description,
     this.color,
@@ -25,6 +29,7 @@ class CustomCircleTile extends StatelessWidget {
     this.descriptionStyle,
     this.spacing,
     this.placeholder,
+    this.child,
   });
 
   @override
@@ -32,7 +37,7 @@ class CustomCircleTile extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(child: _buildImage()),
+        _buildImage(),
         SizedBox(height: spacing ?? Dimens.spaceSmall),
         SizedBox(
           width: size,
@@ -41,7 +46,6 @@ class CustomCircleTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildTitle(),
-
               Text(
                 description,
                 style:
@@ -52,9 +56,9 @@ class CustomCircleTile extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                overflow: TextOverflow.visible,
                 textAlign: TextAlign.center,
-                softWrap: true,
+                softWrap: false,
               ),
             ],
           ),
@@ -80,14 +84,29 @@ class CustomCircleTile extends StatelessWidget {
     );
   }
 
-  ClipOval _buildImage() {
-    return ClipOval(
-      child: CustomCachedImage(
+  Widget _buildImage() {
+    Widget imageWidget;
+
+    if (child != null) {
+      imageWidget = child!;
+    } else if (isSvg) {
+      imageWidget = SvgPicture.asset(
+        imageUrl,
+        height: size ?? 100.h,
+        width: size ?? 100.h,
+        fit: BoxFit.cover,
+        placeholderBuilder: (context) =>
+            placeholder ?? Container(color: Colors.grey.shade200),
+      );
+    } else {
+      imageWidget = CustomCachedImage(
         imageUrl: imageUrl,
         height: size ?? 100.h,
-        width: size,
+        width: size ?? 100.h,
         fit: BoxFit.cover,
-      ),
-    );
+      );
+    }
+
+    return ClipOval(child: imageWidget);
   }
 }
