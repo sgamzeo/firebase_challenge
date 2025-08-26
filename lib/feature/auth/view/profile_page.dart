@@ -1,9 +1,10 @@
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_challenge/core/components/buttons/custom_button.dart';
 import 'package:firebase_challenge/core/components/cards/custom_circle_tile.dart';
 import 'package:firebase_challenge/core/constants/asset_constants.dart';
 import 'package:firebase_challenge/core/constants/dimens.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -11,23 +12,42 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Profile"), centerTitle: true),
-      body: Padding(
-        padding: Dimens.pagePaddingMedium,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            CustomCircleTile(
-              imageUrl: AssetConstants.customAvatar,
-              size: Dimens.imageSizeXXLarge,
-              spacing: Dimens.spaceXLarge,
-              isSvg: true,
-              title: 'Sena Oz',
-              description: 'ssenagamzee@gmail.com',
-            ),
-            SizedBox(height: Dimens.spaceXXLarge),
-            CustomButton(onPressed: () {}, text: "Logout"),
-          ],
+      appBar: AppBar(title: const Text("Profile"), centerTitle: true),
+      body: SafeArea(
+        child: Padding(
+          padding: Dimens.pagePaddingMedium,
+          child: BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              if (state is AuthLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is AuthUnauthenticated) {
+                return const Center(child: Text("Please login first"));
+              }
+              if (state is AuthAuthenticated) {
+                final user = state.user;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomCircleTile(
+                      imageUrl: AssetConstants.customAvatar,
+                      size: Dimens.imageSizeXXLarge,
+                      spacing: Dimens.spaceXLarge,
+                      isSvg: true,
+                      title: user.name ?? "Unknown",
+                      description: user.email!,
+                    ),
+                    SizedBox(height: Dimens.spaceXXLarge),
+                    CustomButton(
+                      onPressed: () => context.read<AuthCubit>().signOut(),
+                      text: "Logout",
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );

@@ -1,6 +1,9 @@
 // main.dart
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
+import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
 import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,8 +34,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(
-          create: (context) =>
-              AuthCubit(authRepository: di.getIt<AuthRepository>()),
+          create: (context) => AuthCubit(
+            signInUseCase: di.getIt<SignInUseCase>(),
+            signUpUseCase: di.getIt<SignUpUseCase>(),
+            getCurrentUserUseCase: di.getIt<GetCurrentUserUseCase>(),
+          ),
         ),
       ],
       child: MaterialApp(

@@ -159,4 +159,17 @@ class AuthRepositoryImpl implements AuthRepository {
       return null;
     }
   }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      return UserEntity(
+        id: currentUser.uid,
+        name: currentUser.displayName,
+        email: currentUser.email,
+      );
+    }
+    return null;
+  }
 }

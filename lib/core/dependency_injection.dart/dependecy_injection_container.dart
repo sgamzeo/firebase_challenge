@@ -1,4 +1,5 @@
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository_implementation.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
 import 'package:get_it/get_it.dart';
@@ -27,5 +28,9 @@ void setupDependencies() {
 
   getIt.registerSingleton<SignUpUseCase>(
     SignUpUseCase(getIt<AuthRepository>()),
+  );
+
+  getIt.registerSingleton<GetCurrentUserUseCase>(
+    GetCurrentUserUseCase(getIt<AuthRepository>()),
   );
 }
