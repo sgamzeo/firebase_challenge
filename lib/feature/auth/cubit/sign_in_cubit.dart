@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_challenge/core/logger/app_logger.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 
 part 'sign_in_state.dart';

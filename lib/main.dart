@@ -14,7 +14,6 @@ import 'package:firebase_challenge/core/constants/dimens.dart';
 import 'package:firebase_challenge/core/theme/theme_extensions.dart';
 import 'package:firebase_challenge/firebase_options.dart';
 import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
-import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

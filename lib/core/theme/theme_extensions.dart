@@ -50,7 +50,6 @@ extension ContextThemeExtension on BuildContext {
       case ThemeType.homePage:
         return AppColorScheme.primary;
       case ThemeType.primary:
-      default:
         return AppColorScheme.primary;
     }
   }

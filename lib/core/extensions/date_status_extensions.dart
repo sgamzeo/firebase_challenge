@@ -4,7 +4,7 @@ extension DateTimeStatus on DateTime {
   DateStatus get dateStatus {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final date = DateTime(this.year, this.month, this.day);
+    final date = DateTime(year, month, day);
 
     if (date.isBefore(today)) return DateStatus.past;
     if (date.isAtSameMomentAs(today)) return DateStatus.today;

@@ -100,7 +100,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
         // Token'ın süresinin dolup dolmadığını kontrol et
         final isTokenValid =
-            idTokenResult != null &&
             idTokenResult.token != null &&
             !idTokenResult.expirationTime!.isBefore(DateTime.now());
 

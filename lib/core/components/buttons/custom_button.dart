@@ -53,7 +53,6 @@ class CustomButton extends StatelessWidget {
       ButtonVariant.danger => scheme.error,
       ButtonVariant.outline => Colors.transparent,
       ButtonVariant.text => Colors.transparent,
-      _ => null,
     };
   }
 
