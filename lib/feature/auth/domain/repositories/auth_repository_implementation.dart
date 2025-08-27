@@ -1,13 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_challenge/core/logger/app_logger.dart';
 import 'package:firebase_challenge/core/services/token_manager.dart';
 import 'package:firebase_challenge/feature/auth/domain/entities/user_entity.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
+import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TokenManager tokenManager;
+  final UserRepository userRepository;
 
-  AuthRepositoryImpl({required this.tokenManager});
+  AuthRepositoryImpl({
+    required this.tokenManager,
+    required this.userRepository,
+  });
 
   @override
   Future<UserEntity> signIn(String email, String password) async {
@@ -43,9 +49,22 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
 
-      // Token'ı al ve geçerliliğini kontrol et
-      final token = await userCredential.user?.getIdToken(true);
+      // Kullanıcı profilini güncelle (isim bilgisini ekle)
+      await userCredential.user?.updateDisplayName(name);
 
+      // Firestore'da kullanıcı profili oluştur
+      try {
+        await userRepository.createUserProfile(
+          userCredential.user!.uid,
+          name,
+          email,
+        );
+      } catch (e) {
+        AppLogger.e('Firestore user profile creation failed', e);
+        // Firestore hatası ana işlemi durdurmasın
+      }
+
+      final token = await userCredential.user?.getIdToken(true);
       if (token != null) {
         await tokenManager.saveToken(token);
         return UserEntity(
@@ -56,7 +75,6 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       throw Exception('Failed to get token');
     } catch (e) {
-      // Hata durumunda token'ı temizle
       await tokenManager.clearToken();
       throw Exception(e.toString());
     }
@@ -161,14 +179,53 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      return UserEntity(
-        id: currentUser.uid,
-        name: currentUser.displayName,
-        email: currentUser.email,
-      );
+    try {
+      // Firebase Auth'dan mevcut kullanıcıyı al
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        // Kullanıcı bilgilerini güncelle
+        await currentUser.reload();
+        final updatedUser = _auth.currentUser;
+
+        // Firestore'dan ek kullanıcı bilgilerini al
+        final userProfile = await userRepository.getUserProfile(
+          updatedUser!.uid,
+        );
+
+        return UserEntity(
+          id: updatedUser.uid,
+          name: userProfile?['name'] ?? updatedUser.displayName,
+          email: updatedUser.email,
+        );
+      }
+      return null;
+    } catch (e) {
+      AppLogger.e('Error getting current user', e);
+      return null;
     }
-    return null;
+  }
+
+  @override
+  Stream<UserEntity?> authStateChanges() {
+    return _auth.authStateChanges().asyncMap((user) async {
+      if (user != null) {
+        // Kullanıcı oturum açmışsa
+        final token = await user.getIdToken();
+        await tokenManager.saveToken(token ?? '');
+
+        // Firestore'dan kullanıcı bilgilerini al
+        final userProfile = await userRepository.getUserProfile(user.uid);
+
+        return UserEntity(
+          id: user.uid,
+          name: userProfile?['name'] ?? user.displayName,
+          email: user.email,
+        );
+      } else {
+        // Kullanıcı oturumu kapatmışsa
+        await tokenManager.clearToken();
+        return null;
+      }
+    });
   }
 }

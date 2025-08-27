@@ -8,4 +8,5 @@ abstract class AuthRepository {
   Future<void> signOut();
   Future<String?> getToken();
   Future<bool> isSignedIn();
+  Stream<UserEntity?> authStateChanges();
 }
