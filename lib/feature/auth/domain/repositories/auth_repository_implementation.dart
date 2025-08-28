@@ -41,6 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // auth_repository_implementation.dart
   @override
   Future<UserEntity> signUp(String name, String email, String password) async {
     try {
@@ -49,24 +50,19 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
 
-      // Kullanıcı profilini güncelle (isim bilgisini ekle)
-      await userCredential.user?.updateDisplayName(name);
+      // Create user profile in Firestore
+      await userRepository.createUserProfile(
+        userCredential.user!.uid,
+        name,
+        email,
+      );
 
-      // Firestore'da kullanıcı profili oluştur
-      try {
-        await userRepository.createUserProfile(
-          userCredential.user!.uid,
-          name,
-          email,
-        );
-      } catch (e) {
-        AppLogger.e('Firestore user profile creation failed', e);
-        // Firestore hatası ana işlemi durdurmasın
-      }
-
+      // Get token and save it
       final token = await userCredential.user?.getIdToken(true);
       if (token != null) {
         await tokenManager.saveToken(token);
+
+        // Return the user entity
         return UserEntity(
           id: userCredential.user?.uid,
           email: userCredential.user?.email,

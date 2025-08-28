@@ -1,3 +1,4 @@
+// sign_up_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_challenge/core/logger/app_logger.dart';
