@@ -169,7 +169,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
         return UserEntity(
           id: updatedUser.uid,
-          name: userProfile?['name'] ?? updatedUser.displayName,
+          name: userProfile?.name ?? updatedUser.displayName,
           email: updatedUser.email,
         );
       }
@@ -191,7 +191,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
         return UserEntity(
           id: user.uid,
-          name: userProfile?['name'] ?? user.displayName,
+          name: userProfile?.name ?? user.displayName,
           email: user.email,
         );
       } else {
@@ -199,5 +199,21 @@ class AuthRepositoryImpl implements AuthRepository {
         return null;
       }
     });
+  }
+
+  @override
+  Future<void> deleteUser(String uid) async {
+    try {
+      // await userRepository.deleteUserProfile(uid);
+
+      final currentUser = _auth.currentUser;
+      if (currentUser != null && currentUser.uid == uid) {
+        await currentUser.delete();
+      }
+
+      await tokenManager.clearToken();
+    } catch (e) {
+      throw Exception('Failed to delete user: $e');
+    }
   }
 }

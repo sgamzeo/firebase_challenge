@@ -18,7 +18,7 @@ class AuthCubit extends Cubit<AuthState> {
   final GetAuthStateChangesUseCase getAuthStateChangesUseCase;
   final SignOutUseCase signOutUseCase;
 
-  StreamSubscription? _authSubscription;
+  StreamSubscription<UserEntity?>? _authSubscription;
 
   AuthCubit({
     required this.signInUseCase,
@@ -27,7 +27,10 @@ class AuthCubit extends Cubit<AuthState> {
     required this.getAuthStateChangesUseCase,
     required this.signOutUseCase,
   }) : super(AuthInitial()) {
-    // Auth state changes stream'ini dinle
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
     _authSubscription = getAuthStateChangesUseCase().listen((user) {
       if (user != null) {
         emit(AuthAuthenticated(user: user));
@@ -37,23 +40,8 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
-  Future<void> checkAuth() async {
-    emit(AuthLoading());
-    try {
-      final user = await getCurrentUserUseCase();
-      if (user != null) {
-        emit(AuthAuthenticated(user: user));
-      } else {
-        emit(AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(AuthUnauthenticated());
-    }
-  }
-
   Future<void> signOut() async {
     await signOutUseCase();
-    // Stream otomatik olarak AuthUnauthenticated state'ini emit edecek
   }
 
   Future<void> signIn(String email, String password) async {
@@ -74,5 +62,11 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       emit(AuthUnauthenticated());
     }
+  }
+
+  @override
+  Future<void> close() {
+    _authSubscription?.cancel();
+    return super.close();
   }
 }
