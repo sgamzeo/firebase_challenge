@@ -23,7 +23,6 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
 
-      // Token'ı al ve geçerliliğini kontrol et
       final token = await userCredential.user?.getIdToken(true);
 
       if (token != null) {
@@ -35,13 +34,11 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       throw Exception('Failed to get token');
     } catch (e) {
-      // Hata durumunda token'ı temizle
       await tokenManager.clearToken();
       throw Exception(e.toString());
     }
   }
 
-  // auth_repository_implementation.dart
   @override
   Future<UserEntity> signUp(String name, String email, String password) async {
     try {
@@ -50,19 +47,16 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
 
-      // Create user profile in Firestore
       await userRepository.createUserProfile(
         userCredential.user!.uid,
         name,
         email,
       );
 
-      // Get token and save it
       final token = await userCredential.user?.getIdToken(true);
       if (token != null) {
         await tokenManager.saveToken(token);
 
-        // Return the user entity
         return UserEntity(
           id: userCredential.user?.uid,
           email: userCredential.user?.email,
@@ -94,25 +88,19 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> isSignedIn() async {
     try {
-      // 1. Önce local storage'daki token'ı kontrol et
       final storedToken = tokenManager.getToken();
       if (storedToken == null || storedToken.isEmpty) {
         return false;
       }
 
-      // 2. Firebase Auth durumunu kontrol et
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
         await tokenManager.clearToken();
         return false;
       }
-
-      // 3. Token'ın geçerliliğini Firebase'den doğrula
       try {
-        // Force refresh ile en güncel token bilgisini al
         final idTokenResult = await currentUser.getIdTokenResult(true);
 
-        // Token'ın süresinin dolup dolmadığını kontrol et
         final isTokenValid =
             idTokenResult.token != null &&
             !idTokenResult.expirationTime!.isBefore(DateTime.now());
@@ -123,9 +111,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return false;
         }
 
-        // 4. Kullanıcının Firebase'de hala aktif olup olmadığını kontrol et
         try {
-          // Kullanıcı bilgilerini refresh et
           await currentUser.reload();
           final refreshedUser = _auth.currentUser;
 
@@ -136,19 +122,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
           return true;
         } catch (e) {
-          // Kullanıcı silinmiş veya devre dışı bırakılmış
           await tokenManager.clearToken();
           await _auth.signOut();
           return false;
         }
       } catch (e) {
-        // Token geçersiz
         await tokenManager.clearToken();
         await _auth.signOut();
         return false;
       }
     } catch (e) {
-      // Herhangi bir hata durumunda token'ı temizle
       await tokenManager.clearToken();
       try {
         await _auth.signOut();
@@ -157,7 +140,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // İsteğe bağlı: Token'ı manuel olarak refresh etmek için ek metod
   Future<String?> refreshToken() async {
     try {
       final currentUser = _auth.currentUser;
@@ -176,14 +158,11 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity?> getCurrentUser() async {
     try {
-      // Firebase Auth'dan mevcut kullanıcıyı al
       final currentUser = _auth.currentUser;
       if (currentUser != null) {
-        // Kullanıcı bilgilerini güncelle
         await currentUser.reload();
         final updatedUser = _auth.currentUser;
 
-        // Firestore'dan ek kullanıcı bilgilerini al
         final userProfile = await userRepository.getUserProfile(
           updatedUser!.uid,
         );
@@ -205,11 +184,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Stream<UserEntity?> authStateChanges() {
     return _auth.authStateChanges().asyncMap((user) async {
       if (user != null) {
-        // Kullanıcı oturum açmışsa
         final token = await user.getIdToken();
         await tokenManager.saveToken(token ?? '');
 
-        // Firestore'dan kullanıcı bilgilerini al
         final userProfile = await userRepository.getUserProfile(user.uid);
 
         return UserEntity(
@@ -218,7 +195,6 @@ class AuthRepositoryImpl implements AuthRepository {
           email: user.email,
         );
       } else {
-        // Kullanıcı oturumu kapatmışsa
         await tokenManager.clearToken();
         return null;
       }

@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository_implementation.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository.dart';
+import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository_implementation.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state_use_case.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
@@ -15,16 +15,12 @@ import 'package:firebase_challenge/core/services/token_manager.dart';
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  // Storage
   getIt.registerSingleton<GetStorage>(GetStorage());
 
-  // Services
   getIt.registerSingleton<TokenManager>(TokenManager(getIt<GetStorage>()));
 
-  // Firebase
   getIt.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
 
-  // Repositories
   getIt.registerSingleton<UserRepository>(
     UserRepositoryImpl(getIt<FirebaseFirestore>()),
   );
@@ -56,15 +52,4 @@ void setupDependencies() {
   getIt.registerSingleton<SignOutUseCase>(
     SignOutUseCase(getIt<AuthRepository>()),
   );
-
-  // Cubits
-  // getIt.registerFactory<AuthCubit>(
-  //   () => AuthCubit(
-  //     signInUseCase: getIt<SignInUseCase>(),
-  //     signUpUseCase: getIt<SignUpUseCase>(),
-  //     getCurrentUserUseCase: getIt<GetCurrentUserUseCase>(),
-  //     getAuthStateChangesUseCase: getIt<GetAuthStateChangesUseCase>(),
-  //     signOutUseCase: getIt<SignOutUseCase>(),
-  //   ),
-  // );
 }
