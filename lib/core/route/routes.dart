@@ -1,6 +1,6 @@
 import 'package:firebase_challenge/feature/auth/view/auth_page.dart';
 import 'package:firebase_challenge/feature/auth/view/profile_page.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/view/banana_tree_community_page.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/presentation/banana_tree_community_page.dart';
 import 'package:firebase_challenge/feature/auth/view/sign_in_page.dart';
 import 'package:firebase_challenge/feature/auth/view/sign_up_page.dart';
 import 'package:firebase_challenge/feature/chasing_legends/view/chasing_legends_page.dart';

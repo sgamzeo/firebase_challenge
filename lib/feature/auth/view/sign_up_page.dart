@@ -77,7 +77,7 @@ class SignUpPage extends StatelessWidget {
         ],
         child: Builder(
           builder: (context) {
-            Future<void> _handleSubmit(Map<String, dynamic> values) async {
+            Future<void> handleSubmit(Map<String, dynamic> values) async {
               final name = values['name'] as String;
               final email = values['email'] as String;
               final password = values['password'] as String;
@@ -100,7 +100,7 @@ class SignUpPage extends StatelessWidget {
                     children: [
                       CustomForm(
                         fields: fields,
-                        onSubmit: _handleSubmit,
+                        onSubmit: handleSubmit,
                         submitText: signUpState.isSubmitting
                             ? 'Signing Up...'
                             : 'Sign Up',
