@@ -8,15 +8,26 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-        } else if (state is AuthUnauthenticated) {
-          Navigator.pushReplacementNamed(context, AppRoutes.auth);
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        if (state is AuthInitial || state is AuthLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
+
+        if (state is AuthAuthenticated) {
+          Future.microtask(
+            () => Navigator.pushReplacementNamed(context, AppRoutes.home),
+          );
+        } else if (state is AuthUnauthenticated) {
+          Future.microtask(
+            () => Navigator.pushReplacementNamed(context, AppRoutes.auth),
+          );
+        }
+
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
-      child: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }

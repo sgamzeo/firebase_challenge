@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository_implementation.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository.dart';
@@ -51,5 +52,15 @@ void setupDependencies() {
 
   getIt.registerSingleton<SignOutUseCase>(
     SignOutUseCase(getIt<AuthRepository>()),
+  );
+
+  getIt.registerSingleton<AuthCubit>(
+    AuthCubit(
+      signInUseCase: getIt<SignInUseCase>(),
+      signUpUseCase: getIt<SignUpUseCase>(),
+      getCurrentUserUseCase: getIt<GetCurrentUserUseCase>(),
+      getAuthStateChangesUseCase: getIt<GetAuthStateChangesUseCase>(),
+      signOutUseCase: getIt<SignOutUseCase>(),
+    ),
   );
 }
