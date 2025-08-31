@@ -10,7 +10,11 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Welcome'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
       body: Padding(
         padding: Dimens.pagePaddingMedium,
         child: Column(

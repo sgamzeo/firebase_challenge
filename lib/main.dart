@@ -1,11 +1,6 @@
-// main.dart
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
-import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state_use_case.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/sign_out.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
+
 import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,15 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthCubit>(
-          create: (context) => AuthCubit(
-            signInUseCase: di.getIt<SignInUseCase>(),
-            signUpUseCase: di.getIt<SignUpUseCase>(),
-            getCurrentUserUseCase: di.getIt<GetCurrentUserUseCase>(),
-            getAuthStateChangesUseCase: di.getIt<GetAuthStateChangesUseCase>(),
-            signOutUseCase: di.getIt<SignOutUseCase>(),
-          ),
-        ),
+        BlocProvider<AuthCubit>(create: (_) => di.getIt<AuthCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
