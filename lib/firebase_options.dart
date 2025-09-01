@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBd4SxQiytIV6D55tfcgUBsgKz7Cz8gKdg',
-    appId: '1:538847200788:android:44ccdf9e528dbc00084901',
-    messagingSenderId: '538847200788',
-    projectId: 'fir-auth-9d84b',
-    storageBucket: 'fir-auth-9d84b.firebasestorage.app',
+    apiKey: 'AIzaSyDsjph5s_qlfy5geBa86unxzTqt8ID2-t4',
+    appId: '1:340921308741:android:eef2575c373340ad09752c',
+    messagingSenderId: '340921308741',
+    projectId: 'fir-auth2-2f866',
+    storageBucket: 'fir-auth2-2f866.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDPVfwg5irqONlc_gqaPfFVPUYLXK0EFIg',
-    appId: '1:538847200788:ios:2674ab41bf281da7084901',
-    messagingSenderId: '538847200788',
-    projectId: 'fir-auth-9d84b',
-    storageBucket: 'fir-auth-9d84b.firebasestorage.app',
+    apiKey: 'AIzaSyDqjTposl1WdSJoR7LhesJZGwPDiRscwQI',
+    appId: '1:340921308741:ios:5bbf774cd7d9bfde09752c',
+    messagingSenderId: '340921308741',
+    projectId: 'fir-auth2-2f866',
+    storageBucket: 'fir-auth2-2f866.firebasestorage.app',
     iosBundleId: 'com.example.firebaseChallenge',
   );
+
 }
