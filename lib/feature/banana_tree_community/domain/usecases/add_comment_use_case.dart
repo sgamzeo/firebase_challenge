@@ -1,5 +1,4 @@
 import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/comment/comment_repository.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post/post_repository.dart';
 
 class AddCommentUseCase {
   final CommentRepository repository;

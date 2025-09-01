@@ -1,6 +1,4 @@
-import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_like_use_case.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/remove_like_use_case.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/upload_image_use_case.dart';
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/post_entity.dart';
@@ -8,8 +6,10 @@ import '../../domain/usecases/add_comment_use_case.dart';
 import '../../domain/usecases/remove_comment_use_case.dart';
 import '../../domain/usecases/create_post_usecase.dart';
 import '../../domain/usecases/get_posts_usecase.dart';
+import '../../domain/usecases/add_like_use_case.dart';
+import '../../domain/usecases/remove_like_use_case.dart';
+import '../../domain/usecases/upload_image_use_case.dart';
 import 'post_state.dart';
-import 'dart:io';
 
 class PostCubit extends Cubit<PostState> {
   final GetPostsUseCase getPostsUseCase;
@@ -30,6 +30,17 @@ class PostCubit extends Cubit<PostState> {
     required this.uploadImageUseCase,
   }) : super(PostInitial());
 
+  File? _selectedImage;
+
+  File? get selectedImage => _selectedImage;
+
+  // pick image from device and update state
+  void pickImage(File image) {
+    _selectedImage = image;
+    emit(PostImageSelected(image));
+  }
+
+  // fetch all posts from repository
   Future<void> fetchPosts() async {
     try {
       emit(PostLoading());
@@ -40,6 +51,7 @@ class PostCubit extends Cubit<PostState> {
     }
   }
 
+  // create post with uploaded image
   Future<void> createPostWithImage({
     required File imageFile,
     required String caption,
@@ -48,7 +60,7 @@ class PostCubit extends Cubit<PostState> {
     try {
       emit(PostLoading());
 
-      // post image to storage
+      // upload image to storage
       final imageUrl = await uploadImageUseCase(imageFile, userId);
 
       // create post entity
@@ -63,27 +75,22 @@ class PostCubit extends Cubit<PostState> {
       );
 
       await createPostUseCase(post);
+
+      // clear selected image after post
+      _selectedImage = null;
+
       await fetchPosts();
     } catch (e) {
-      emit(PostError('Post oluşturulurken hata oluştu: ${e.toString()}'));
+      emit(PostError('error creating post: ${e.toString()}'));
     }
   }
 
-  Future<void> addPost(PostEntity post) async {
-    try {
-      emit(PostLoading());
-      await createPostUseCase(post);
-      await fetchPosts();
-    } catch (e) {
-      emit(PostError(e.toString()));
-    }
-  }
-
+  // toggle like/unlike for a post
   Future<void> toggleLike(PostEntity post, String currentUserId) async {
     try {
       bool isLiked = post.likedBy.contains(currentUserId);
+      List<String> updatedLikedBy = List.from(post.likedBy);
 
-      List<String> updatedLikedBy = List<String>.from(post.likedBy);
       if (isLiked) {
         updatedLikedBy.remove(currentUserId);
         await removeLikeUseCase(post.id, currentUserId);
@@ -92,7 +99,7 @@ class PostCubit extends Cubit<PostState> {
         await addLikeUseCase(post.id, currentUserId);
       }
 
-      PostEntity updatedPost = post.copyWith(likedBy: updatedLikedBy);
+      final updatedPost = post.copyWith(likedBy: updatedLikedBy);
 
       if (state is PostLoaded) {
         final posts = (state as PostLoaded).posts.map((p) {
@@ -105,6 +112,7 @@ class PostCubit extends Cubit<PostState> {
     }
   }
 
+  // add comment to post
   Future<void> addComment(
     PostEntity post,
     String userId,
@@ -118,6 +126,7 @@ class PostCubit extends Cubit<PostState> {
     }
   }
 
+  // remove comment from post
   Future<void> removeComment(PostEntity post, String commentId) async {
     try {
       await removeCommentUseCase(post.id, commentId);

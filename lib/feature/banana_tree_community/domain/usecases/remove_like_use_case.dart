@@ -1,5 +1,4 @@
 import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/like/like_repository.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post/post_repository.dart';
 
 class RemoveLikeUseCase {
   final LikeRepository repository;

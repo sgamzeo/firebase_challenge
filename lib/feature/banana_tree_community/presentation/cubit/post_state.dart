@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/post_entity.dart';
 
@@ -14,7 +15,6 @@ class PostLoading extends PostState {}
 
 class PostLoaded extends PostState {
   final List<PostEntity> posts;
-
   const PostLoaded(this.posts);
 
   @override
@@ -23,31 +23,17 @@ class PostLoaded extends PostState {
 
 class PostError extends PostState {
   final String message;
-
   const PostError(this.message);
 
   @override
   List<Object?> get props => [message];
 }
 
-// import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/post_entity.dart';
+// state when image is selected
+class PostImageSelected extends PostState {
+  final File imageFile;
+  const PostImageSelected(this.imageFile);
 
-// class PostState {
-//   final List<PostEntity> posts;
-//   final bool isLoading;
-//   final String? error;
-
-//   PostState({required this.posts, this.isLoading = false, this.error});
-
-//   PostState copyWith({
-//     List<PostEntity>? posts,
-//     bool? isLoading,
-//     String? error,
-//   }) {
-//     return PostState(
-//       posts: posts ?? this.posts,
-//       isLoading: isLoading ?? this.isLoading,
-//       error: error ?? this.error,
-//     );
-//   }
-// }
+  @override
+  List<Object?> get props => [imageFile];
+}

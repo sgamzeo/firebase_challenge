@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,7 +13,9 @@ class UploadPostPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
 
-    print('UploadPostPage initial Auth state: ${authCubit.state}');
+    if (kDebugMode) {
+      print('UploadPostPage initial Auth state: ${authCubit.state}');
+    }
 
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -22,7 +25,9 @@ class UploadPostPage extends StatelessWidget {
       },
       child: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
-          print('BlocBuilder build called with state: $state');
+          if (kDebugMode) {
+            print('BlocBuilder build called with state: $state');
+          }
 
           if (state is AuthAuthenticated) {
             return Scaffold(
