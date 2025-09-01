@@ -9,6 +9,18 @@ import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_out.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/datasources/post_remote_data_source.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/datasources/post_remote_data_source_impl.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository_impl.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_comment_use_case.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_like_use_case.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/get_posts_usecase.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/create_post_usecase.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/remove_comment_use_case.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/remove_like_use_case.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/upload_image_use_case.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_challenge/core/services/token_manager.dart';
@@ -33,7 +45,6 @@ void setupDependencies() {
     ),
   );
 
-  // Use Cases
   getIt.registerSingleton<SignInUseCase>(
     SignInUseCase(getIt<AuthRepository>()),
   );
@@ -54,6 +65,40 @@ void setupDependencies() {
     SignOutUseCase(getIt<AuthRepository>()),
   );
 
+  getIt.registerSingleton<PostRemoteDataSource>(
+    PostRemoteDataSourceImpl(getIt<FirebaseFirestore>()),
+  );
+
+  getIt.registerSingleton<PostRepository>(
+    PostRepositoryImpl(getIt<PostRemoteDataSource>()),
+  );
+
+  getIt.registerSingleton<GetPostsUseCase>(
+    GetPostsUseCase(getIt<PostRepository>()),
+  );
+  getIt.registerSingleton<CreatePostUseCase>(
+    CreatePostUseCase(getIt<PostRepository>()),
+  );
+
+  getIt.registerSingleton<AddLikeUseCase>(
+    AddLikeUseCase(getIt<PostRepository>()),
+  );
+
+  getIt.registerSingleton<RemoveLikeUseCase>(
+    RemoveLikeUseCase(getIt<PostRepository>()),
+  );
+
+  getIt.registerSingleton<AddCommentUseCase>(
+    AddCommentUseCase(getIt<PostRepository>()),
+  );
+
+  getIt.registerSingleton<RemoveCommentUseCase>(
+    RemoveCommentUseCase(getIt<PostRepository>()),
+  );
+
+  getIt.registerSingleton<UploadImageUseCase>(
+    UploadImageUseCase(getIt<PostRepository>()),
+  );
   getIt.registerSingleton<AuthCubit>(
     AuthCubit(
       signInUseCase: getIt<SignInUseCase>(),
@@ -61,6 +106,18 @@ void setupDependencies() {
       getCurrentUserUseCase: getIt<GetCurrentUserUseCase>(),
       getAuthStateChangesUseCase: getIt<GetAuthStateChangesUseCase>(),
       signOutUseCase: getIt<SignOutUseCase>(),
+    ),
+  );
+
+  getIt.registerSingleton<PostCubit>(
+    PostCubit(
+      getPostsUseCase: getIt<GetPostsUseCase>(),
+      createPostUseCase: getIt<CreatePostUseCase>(),
+      addLikeUseCase: getIt<AddLikeUseCase>(),
+      removeLikeUseCase: getIt<RemoveLikeUseCase>(),
+      addCommentUseCase: getIt<AddCommentUseCase>(),
+      removeCommentUseCase: getIt<RemoveCommentUseCase>(),
+      uploadImageUseCase: getIt<UploadImageUseCase>(),
     ),
   );
 }

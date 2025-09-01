@@ -29,3 +29,25 @@ class PostError extends PostState {
   @override
   List<Object?> get props => [message];
 }
+
+// import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/post_entity.dart';
+
+// class PostState {
+//   final List<PostEntity> posts;
+//   final bool isLoading;
+//   final String? error;
+
+//   PostState({required this.posts, this.isLoading = false, this.error});
+
+//   PostState copyWith({
+//     List<PostEntity>? posts,
+//     bool? isLoading,
+//     String? error,
+//   }) {
+//     return PostState(
+//       posts: posts ?? this.posts,
+//       isLoading: isLoading ?? this.isLoading,
+//       error: error ?? this.error,
+//     );
+//   }
+// }

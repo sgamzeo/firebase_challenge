@@ -1,15 +1,14 @@
 import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
-
 import '../entities/post_entity.dart';
 
-class GetPostsUseCase {
+class CreatePostUseCase {
   final PostRepository repository;
 
-  GetPostsUseCase(this.repository);
+  CreatePostUseCase(this.repository);
 
-  Future<List<PostEntity>> call() async {
+  Future<void> call(PostEntity post) async {
     try {
-      return await repository.getPosts();
+      await repository.createPost(post);
     } catch (e) {
       rethrow;
     }

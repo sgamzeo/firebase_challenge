@@ -1,15 +1,13 @@
 import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
 
-import '../entities/post_entity.dart';
-
-class GetPostsUseCase {
+class RemoveCommentUseCase {
   final PostRepository repository;
 
-  GetPostsUseCase(this.repository);
+  RemoveCommentUseCase(this.repository);
 
-  Future<List<PostEntity>> call() async {
+  Future<void> call(String postId, String commentId) async {
     try {
-      return await repository.getPosts();
+      await repository.removeComment(postId, commentId);
     } catch (e) {
       rethrow;
     }

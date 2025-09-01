@@ -1,5 +1,6 @@
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
+import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
 
 import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(create: (_) => di.getIt<AuthCubit>()),
+        BlocProvider<PostCubit>(create: (_) => di.getIt<PostCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

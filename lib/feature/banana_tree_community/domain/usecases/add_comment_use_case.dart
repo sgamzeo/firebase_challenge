@@ -1,15 +1,13 @@
 import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
 
-import '../entities/post_entity.dart';
-
-class GetPostsUseCase {
+class AddCommentUseCase {
   final PostRepository repository;
 
-  GetPostsUseCase(this.repository);
+  AddCommentUseCase(this.repository);
 
-  Future<List<PostEntity>> call() async {
+  Future<void> call(String postId, String userId, String comment) async {
     try {
-      return await repository.getPosts();
+      await repository.addComment(postId, userId, comment);
     } catch (e) {
       rethrow;
     }
