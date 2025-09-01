@@ -1,8 +1,9 @@
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
 import 'dart:io';
 
+import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/storage/storage_repository.dart';
+
 class UploadImageUseCase {
-  final PostRepository repository;
+  final StorageRepository repository;
 
   UploadImageUseCase(this.repository);
 

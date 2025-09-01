@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/comment_entity.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/post_entity.dart';
 import 'post_remote_data_source.dart';
-import 'dart:io';
 
 class PostRemoteDataSourceImpl implements PostRemoteDataSource {
   final FirebaseFirestore firestore;
@@ -85,69 +84,5 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
             'createdAt': comment.createdAt,
           });
     }
-  }
-
-  @override
-  Future<String> uploadImage(File imageFile, String userId) async {
-    try {
-      final String fileName =
-          '${DateTime.now().millisecondsSinceEpoch}_$userId.jpg';
-      final Reference ref = storage.ref().child('post_images/$fileName');
-      final UploadTask uploadTask = ref.putFile(imageFile);
-      final TaskSnapshot snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      throw Exception('Resim yüklenirken hata oluştu: $e');
-    }
-  }
-
-  @override
-  Future<void> deleteImage(String imageUrl) async {
-    try {
-      final Reference ref = storage.refFromURL(imageUrl);
-      await ref.delete();
-    } catch (e) {
-      throw Exception('Resim silinirken hata oluştu: $e');
-    }
-  }
-
-  // Diğer metod implementasyonları aynı kalacak
-  @override
-  Future<void> addLike(String postId, String userId) async {
-    await firestore.collection('posts').doc(postId).update({
-      'likedBy': FieldValue.arrayUnion([userId]),
-    });
-  }
-
-  @override
-  Future<void> removeLike(String postId, String userId) async {
-    await firestore.collection('posts').doc(postId).update({
-      'likedBy': FieldValue.arrayRemove([userId]),
-    });
-  }
-
-  @override
-  Future<void> addComment(String postId, String userId, String comment) async {
-    final docRef = firestore
-        .collection('posts')
-        .doc(postId)
-        .collection('comments')
-        .doc();
-    await docRef.set({
-      'id': docRef.id,
-      'userId': userId,
-      'text': comment,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  @override
-  Future<void> removeComment(String postId, String commentId) async {
-    await firestore
-        .collection('posts')
-        .doc(postId)
-        .collection('comments')
-        .doc(commentId)
-        .delete();
   }
 }

@@ -1,7 +1,8 @@
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post_repository.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/comment/comment_repository.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/post/post_repository.dart';
 
 class RemoveCommentUseCase {
-  final PostRepository repository;
+  final CommentRepository repository;
 
   RemoveCommentUseCase(this.repository);
 
