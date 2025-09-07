@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/data/datasources/like/like_remote_data_source.dart';
+import 'package:firebase_challenge/core/data/datasources/like/like_remote_data_source.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class LikeRemoteDataSourceImpl implements LikeRemoteDataSource {

@@ -1,7 +1,7 @@
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
-
+import 'package:firebase_challenge/feature/chasing_legends/cubit/mascot_cubit.dart';
 import 'package:firebase_challenge/feature/splash.dart/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +23,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+// In main.dart
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthCubit>(create: (_) => di.getIt<AuthCubit>()),
         BlocProvider<PostCubit>(create: (_) => di.getIt<PostCubit>()),
+        BlocProvider<MascotCubit>(create: (_) => di.getIt<MascotCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

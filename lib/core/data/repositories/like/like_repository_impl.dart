@@ -1,6 +1,6 @@
-import 'package:firebase_challenge/feature/banana_tree_community/data/datasources/like/like_remote_data_source.dart';
+import 'package:firebase_challenge/core/data/datasources/like/like_remote_data_source.dart';
 
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/like/like_repository.dart';
+import 'package:firebase_challenge/core/data/repositories/like/like_repository.dart';
 
 class LikeRepositoryImpl implements LikeRepository {
   final LikeRemoteDataSource likeRemoteDataSource;

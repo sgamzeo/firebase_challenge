@@ -1,5 +1,5 @@
-import 'package:firebase_challenge/feature/banana_tree_community/data/datasources/comment/comment_remote_data_source.dart';
-import 'package:firebase_challenge/feature/banana_tree_community/data/repositories/comment/comment_repository.dart';
+import 'package:firebase_challenge/core/data/datasources/comment/comment_remote_data_source.dart';
+import 'package:firebase_challenge/core/data/repositories/comment/comment_repository.dart';
 
 class CommentRepositoryImpl implements CommentRepository {
   final CommentRemoteDataSource commentRemoteDataSource;
