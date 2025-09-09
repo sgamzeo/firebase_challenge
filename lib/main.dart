@@ -1,3 +1,4 @@
+import 'dart:ui'; // PlatformDispatcher için
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
@@ -13,17 +14,24 @@ import 'package:firebase_challenge/core/theme/theme_extensions.dart';
 import 'package:firebase_challenge/firebase_options.dart';
 import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 
-void main() async {
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   di.setupDependencies();
 
   runApp(const MyApp());
 }
 
-// In main.dart
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

@@ -11,4 +11,7 @@ abstract class AuthRepository {
   Future<String?> getToken();
   Future<bool> isSignedIn();
   Stream<UserEntity?> authStateChanges();
+
+  Future<void> sendPasswordResetEmail(String email);
+  // Future<void> sendEmailVerification();
 }

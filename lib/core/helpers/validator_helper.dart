@@ -2,7 +2,6 @@ enum FieldType { email, password, phone, normal }
 
 enum ValidatorType { none, email, password, phone, required }
 
-// client side
 class ValidatorHelper {
   static String? validate(String value, ValidatorType type) {
     if (value.isEmpty) {
@@ -14,6 +13,9 @@ class ValidatorHelper {
         final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
         if (!emailRegex.hasMatch(value)) {
           return 'Please enter a valid email address';
+        }
+        if (!value.endsWith('@neonapps.co')) {
+          return 'Email must be a neonapps.co domain';
         }
         break;
       case ValidatorType.password:

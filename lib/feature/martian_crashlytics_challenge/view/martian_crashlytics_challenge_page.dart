@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class MartianCrashlyticsChallengePage extends StatelessWidget {
   const MartianCrashlyticsChallengePage({super.key});
@@ -6,8 +7,15 @@ class MartianCrashlyticsChallengePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Test')),
-      body: const Center(child: Text('Test')),
+      appBar: AppBar(title: const Text('Martian Crashlytics Challenge 🚀')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            FirebaseCrashlytics.instance.crash(); // 💥 Test crash
+          },
+          child: const Text("Crash the App 💥"),
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_challenge/feature/auth/domain/repositories/auth_repository_implementation.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository_implementation.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/forgot_password.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/post_entity.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_comment_use_case.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_like_use_case.dart';
@@ -16,7 +17,7 @@ import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_up.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_out.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state_use_case.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state.dart';
 import 'package:firebase_challenge/feature/auth/domain/repositories/user_repository.dart';
 import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 import 'package:firebase_challenge/feature/auth/cubit/sign_in_cubit.dart';
@@ -43,22 +44,18 @@ import 'package:firebase_challenge/core/data/datasources/comment/comment_remote_
 import 'package:firebase_challenge/core/data/repositories/comment/comment_repository.dart';
 import 'package:firebase_challenge/core/data/repositories/comment/comment_repository_impl.dart';
 
-// Add PostCubit import
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
 
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  // 🔹 Core Services
   getIt.registerSingleton<GetStorage>(GetStorage());
   getIt.registerSingleton<TokenManager>(TokenManager(getIt<GetStorage>()));
 
-  // 🔹 User Repository
   getIt.registerSingleton<UserRepository>(
     UserRepositoryImpl(FirebaseFirestore.instance),
   );
 
-  // 🔹 Auth Repository
   getIt.registerSingleton<AuthRepository>(
     AuthRepositoryImpl(
       tokenManager: getIt<TokenManager>(),
@@ -66,7 +63,6 @@ void setupDependencies() {
     ),
   );
 
-  // 🔹 Auth UseCases
   getIt.registerSingleton<SignInUseCase>(
     SignInUseCase(getIt<AuthRepository>()),
   );
@@ -82,8 +78,9 @@ void setupDependencies() {
   getIt.registerSingleton<GetAuthStateChangesUseCase>(
     GetAuthStateChangesUseCase(getIt<AuthRepository>()),
   );
-
-  // 🔹 Auth Cubits
+  getIt.registerFactory(
+    () => SendPasswordResetEmailUseCase(getIt<AuthRepository>()),
+  );
   getIt.registerFactory<SignInCubit>(
     () => SignInCubit(signInUseCase: getIt<SignInUseCase>()),
   );
@@ -97,25 +94,22 @@ void setupDependencies() {
       getCurrentUserUseCase: getIt<GetCurrentUserUseCase>(),
       getAuthStateChangesUseCase: getIt<GetAuthStateChangesUseCase>(),
       signOutUseCase: getIt<SignOutUseCase>(),
+      sendPasswordResetEmailUseCase: getIt<SendPasswordResetEmailUseCase>(),
     ),
   );
 
-  // 🔹 Storage Remote Data Source
   getIt.registerSingleton<StorageRemoteDataSource>(
     StorageRemoteDataSourceImpl(FirebaseStorage.instance),
   );
 
-  // 🔹 Storage Repository
   getIt.registerSingleton<StorageRepository>(
     StorageRepository(getIt<StorageRemoteDataSource>()),
   );
 
-  // 🔹 UploadEntityUseCase (Mascot ve Post için ortak kullanılacak)
   getIt.registerSingleton<UploadEntityUseCase>(
     UploadEntityUseCase(repository: getIt<StorageRepository>()),
   );
 
-  // 🔹 Mascot Remote Data Source
   getIt.registerSingleton<PostRemoteDataSource<Mascot>>(
     PostRemoteDataSourceImpl<Mascot>(
       firestore: FirebaseFirestore.instance,
@@ -125,19 +119,16 @@ void setupDependencies() {
     ),
   );
 
-  // 🔹 Mascot Repository
   getIt.registerSingleton<PostRepository<Mascot>>(
     PostRepository<Mascot>(
       remoteDataSource: getIt<PostRemoteDataSource<Mascot>>(),
     ),
   );
 
-  // 🔹 Mascot UseCases
   getIt.registerSingleton<CreateEntityUseCase<Mascot>>(
     CreateEntityUseCase<Mascot>(getIt<PostRepository<Mascot>>()),
   );
 
-  // 🔹 Mascot Cubit
   getIt.registerFactory<MascotCubit>(
     () => MascotCubit(
       uploadEntityUseCase: getIt<UploadEntityUseCase>(),
@@ -145,22 +136,18 @@ void setupDependencies() {
     ),
   );
 
-  // 🔹 Like Remote Data Source
   getIt.registerSingleton<LikeRemoteDataSource>(
     LikeRemoteDataSourceImpl(FirebaseFirestore.instance),
   );
 
-  // 🔹 Like Repository
   getIt.registerSingleton<LikeRepository>(
     LikeRepositoryImpl(getIt<LikeRemoteDataSource>()),
   );
 
-  // 🔹 Comment Remote Data Source
   getIt.registerSingleton<CommentRemoteDataSource>(
     CommentRemoteDataSourceImpl(FirebaseFirestore.instance),
   );
 
-  // 🔹 Comment Repository
   getIt.registerSingleton<CommentRepository>(
     CommentRepositoryImpl(getIt<CommentRemoteDataSource>()),
   );
@@ -173,7 +160,6 @@ void setupDependencies() {
     RemoveLikeUseCase(getIt<LikeRepository>()),
   );
 
-  // 🔹 Comment UseCases
   getIt.registerSingleton<AddCommentUseCase>(
     AddCommentUseCase(getIt<CommentRepository>()),
   );
@@ -181,7 +167,6 @@ void setupDependencies() {
     RemoveCommentUseCase(getIt<CommentRepository>()),
   );
 
-  // 🔹 Post Remote Data Source
   getIt.registerSingleton<PostRemoteDataSource<PostEntity>>(
     PostRemoteDataSourceImpl<PostEntity>(
       firestore: FirebaseFirestore.instance,
@@ -191,14 +176,12 @@ void setupDependencies() {
     ),
   );
 
-  // 🔹 Post Repository
   getIt.registerSingleton<PostRepository<PostEntity>>(
     PostRepository<PostEntity>(
       remoteDataSource: getIt<PostRemoteDataSource<PostEntity>>(),
     ),
   );
 
-  // 🔹 Post UseCases
   getIt.registerSingleton<GetEntitiesUseCase<PostEntity>>(
     GetEntitiesUseCase<PostEntity>(getIt<PostRepository<PostEntity>>()),
   );
@@ -206,7 +189,6 @@ void setupDependencies() {
     CreateEntityUseCase<PostEntity>(getIt<PostRepository<PostEntity>>()),
   );
 
-  // 🔹 Post Cubit
   getIt.registerFactory<PostCubit>(
     () => PostCubit(
       getPostsUseCase: getIt<GetEntitiesUseCase<PostEntity>>(),

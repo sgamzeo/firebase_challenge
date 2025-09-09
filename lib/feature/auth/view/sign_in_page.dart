@@ -1,5 +1,6 @@
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,6 +98,15 @@ class SignInPage extends StatelessWidget {
                         text: 'Sign Up',
                         onPressed: () {
                           Navigator.pushNamed(context, AppRoutes.signUp);
+                        },
+                      ),
+                      CustomTextButton(
+                        text: 'Forgot Password?',
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.forgotPassword,
+                          );
                         },
                       ),
                     ],

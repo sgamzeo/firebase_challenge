@@ -47,16 +47,18 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
 
+      // Kullanıcı profili oluştur
       await userRepository.createUserProfile(
         userCredential.user!.uid,
         name,
         email,
       );
 
+      await userCredential.user!.sendEmailVerification();
+
       final token = await userCredential.user?.getIdToken(true);
       if (token != null) {
         await tokenManager.saveToken(token);
-
         return UserEntity(
           id: userCredential.user?.uid,
           email: userCredential.user?.email,
@@ -216,4 +218,25 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception('Failed to delete user: $e');
     }
   }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception('Failed to send password reset email: $e');
+    }
+  }
+
+  // @override
+  // Future<void> sendEmailVerification() async {
+  //   try {
+  //     final user = _auth.currentUser;
+  //     if (user != null && !user.emailVerified) {
+  //       await user.sendEmailVerification();
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Failed to send email verification: $e');
+  //   }
+  // }
 }

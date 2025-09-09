@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_challenge/feature/auth/domain/entities/user_entity.dart';
-import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state_use_case.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/forgot_password.dart';
+import 'package:firebase_challenge/feature/auth/domain/usecases/get_auth_state.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/get_current_user.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_in.dart';
 import 'package:firebase_challenge/feature/auth/domain/usecases/sign_out.dart';
@@ -17,6 +18,7 @@ class AuthCubit extends Cubit<AuthState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final GetAuthStateChangesUseCase getAuthStateChangesUseCase;
   final SignOutUseCase signOutUseCase;
+  final SendPasswordResetEmailUseCase sendPasswordResetEmailUseCase;
 
   StreamSubscription<UserEntity?>? _authSubscription;
 
@@ -26,6 +28,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this.getCurrentUserUseCase,
     required this.getAuthStateChangesUseCase,
     required this.signOutUseCase,
+    required this.sendPasswordResetEmailUseCase,
   }) : super(AuthInitial()) {
     _listenToAuthChanges();
   }
@@ -68,5 +71,15 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> close() {
     _authSubscription?.cancel();
     return super.close();
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    emit(AuthLoading());
+    try {
+      await sendPasswordResetEmailUseCase(email);
+      emit(AuthPasswordResetSent());
+    } catch (e) {
+      emit(AuthPasswordResetError(e.toString()));
+    }
   }
 }

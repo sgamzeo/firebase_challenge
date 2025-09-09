@@ -31,3 +31,24 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+
+class AuthForgotPassword extends AuthState {
+  final bool isSuccess;
+  final String? error;
+
+  const AuthForgotPassword({this.isSuccess = false, this.error});
+
+  @override
+  List<Object> get props => [isSuccess, error ?? ''];
+}
+
+class AuthPasswordResetSent extends AuthState {}
+
+class AuthPasswordResetError extends AuthState {
+  final String message;
+
+  const AuthPasswordResetError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
