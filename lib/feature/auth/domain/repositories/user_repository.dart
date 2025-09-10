@@ -2,8 +2,9 @@ import 'package:firebase_challenge/feature/auth/domain/entities/user_profile_ent
 
 abstract class UserRepository {
   Future<void> createUserProfile(String uid, String name, String email);
-  // Future<Map<String, dynamic>?> getUserProfile(String uid);
-
   Future<UserProfileEntity?> getUserProfile(String uid);
-  // Future<void> deleteUserProfile(String uid);
+
+  // FCM token metodlarını ekleyin
+  Future<void> saveFcmToken(String userId, String fcmToken);
+  Future<void> removeFcmToken(String userId, String fcmToken);
 }
