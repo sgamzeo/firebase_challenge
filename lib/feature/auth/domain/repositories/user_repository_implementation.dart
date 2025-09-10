@@ -18,18 +18,44 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<UserProfileEntity?> getUserProfile(String uid) async {
-    final doc = await _firestore.collection('users').doc(uid).get();
-    if (!doc.exists) return null;
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (!doc.exists) {
+        print('User profile not found for uid: $uid');
+        return null;
+      }
 
-    final data = doc.data();
-    if (data == null) return null;
+      final data = doc.data();
+      if (data == null) {
+        print('User profile data is null for uid: $uid');
+        return null;
+      }
 
-    return UserProfileEntity(
-      uid: uid,
-      name: data['name'] as String? ?? '',
-      email: data['email'] as String? ?? '',
-      createdAt: (data['createdAt'] as Timestamp?)!.toDate(),
-    );
+      print('User profile data: $data'); // DEBUG
+
+      return UserProfileEntity(
+        uid: uid,
+        name: data['name'] as String? ?? 'Unknown User',
+        email: data['email'] as String? ?? '',
+        createdAt:
+            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      );
+    } catch (e) {
+      print('Error getting user profile: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> removeFcmToken(String userId, String fcmToken) {
+    // TODO: implement removeFcmToken
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveFcmToken(String userId, String fcmToken) {
+    // TODO: implement saveFcmToken
+    throw UnimplementedError();
   }
 
   // @override

@@ -198,6 +198,7 @@ void setupDependencies() {
       addCommentUseCase: getIt<AddCommentUseCase>(),
       removeCommentUseCase: getIt<RemoveCommentUseCase>(),
       uploadEntityUseCase: getIt<UploadEntityUseCase>(),
+      userRepository: getIt<UserRepository>(), // Ekle
     ),
   );
 }

@@ -1,53 +1,28 @@
 import 'dart:io';
-import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_challenge/feature/auth/domain/entities/user_entity.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../cubit/post_cubit.dart';
 
 class UploadPostPage extends StatelessWidget {
-  const UploadPostPage({super.key});
+  final UserEntity user;
+
+  const UploadPostPage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
-
-    if (kDebugMode) {
-      print('UploadPostPage initial Auth state: ${authCubit.state}');
-    }
-
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        if (state is! AuthAuthenticated) {
-          Navigator.pop(context);
-        }
-      },
-      child: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          if (kDebugMode) {
-            print('BlocBuilder build called with state: $state');
-          }
-
-          if (state is AuthAuthenticated) {
-            return Scaffold(
-              appBar: AppBar(title: const Text('Create Post')),
-              body: _UploadPostForm(userId: state.user.id!),
-            );
-          }
-
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        },
-      ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create Post')),
+      body: _UploadPostForm(user: user),
     );
   }
 }
 
 class _UploadPostForm extends StatefulWidget {
-  final String userId;
-  const _UploadPostForm({required this.userId});
+  final UserEntity user;
+  const _UploadPostForm({required this.user});
 
   @override
   State<_UploadPostForm> createState() => _UploadPostFormState();
@@ -62,9 +37,7 @@ class _UploadPostFormState extends State<_UploadPostForm> {
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      setState(() => _selectedImage = File(pickedFile.path));
     }
   }
 
@@ -78,7 +51,7 @@ class _UploadPostFormState extends State<_UploadPostForm> {
       await context.read<PostCubit>().createPostWithImage(
         imageFile: _selectedImage!,
         caption: _captionController.text.trim(),
-        userId: widget.userId,
+        user: widget.user, // artık user gönderiyoruz
       );
       Navigator.pop(context);
     } catch (e) {

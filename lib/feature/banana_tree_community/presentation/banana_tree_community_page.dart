@@ -1,3 +1,4 @@
+import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_cubit.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/cubit/post_state.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/presentation/pages/post_item.dart';
@@ -5,8 +6,20 @@ import 'package:firebase_challenge/feature/banana_tree_community/presentation/pa
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class BananaTreeCommunityPage extends StatelessWidget {
+class BananaTreeCommunityPage extends StatefulWidget {
   const BananaTreeCommunityPage({super.key});
+
+  @override
+  State<BananaTreeCommunityPage> createState() =>
+      _BananaTreeCommunityPageState();
+}
+
+class _BananaTreeCommunityPageState extends State<BananaTreeCommunityPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<PostCubit>().fetchPosts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +37,19 @@ class BananaTreeCommunityPage extends StatelessWidget {
             if (posts.isEmpty) {
               return const Center(child: Text('Henüz paylaşım yok.'));
             }
-            return ListView.builder(
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return PostItem(post: post);
+            return RefreshIndicator(
+              onRefresh: () async {
+                // 📌 Pull-to-refresh desteği
+                await context.read<PostCubit>().fetchPosts();
               },
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: posts.length,
+                itemBuilder: (context, index) {
+                  final post = posts[index];
+                  return PostItem(post: post);
+                },
+              ),
             );
           } else if (state is PostError) {
             return Center(child: Text('Hata: ${state.message}'));
@@ -39,11 +59,18 @@ class BananaTreeCommunityPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const UploadPostPage()),
-          );
+        onPressed: () async {
+          final authState = context.read<AuthCubit>().state;
+          if (authState is AuthAuthenticated) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => UploadPostPage(user: authState.user),
+              ),
+            );
+            context.read<PostCubit>().fetchPosts();
+          }
+          context.read<PostCubit>().fetchPosts();
         },
       ),
     );

@@ -1,67 +1,58 @@
-// PostEntity with fromMap and toMap methods
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_challenge/feature/auth/domain/entities/user_entity.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/comment_entity.dart';
 
 class PostEntity {
   final String id;
-  final String userId;
+  final UserEntity user;
   final String imageUrl;
   final String caption;
   final List<String> likedBy;
   final List<CommentEntity> comments;
   final DateTime createdAt;
 
-  const PostEntity({
+  PostEntity({
     required this.id,
-    required this.userId,
+    required this.user,
     required this.imageUrl,
     required this.caption,
     required this.likedBy,
     required this.comments,
     required this.createdAt,
   });
-
-  PostEntity copyWith({
-    String? caption,
-    List<String>? likedBy,
-    List<CommentEntity>? comments,
-  }) {
-    return PostEntity(
-      id: id,
-      userId: userId,
-      imageUrl: imageUrl,
-      caption: caption ?? this.caption,
-      likedBy: likedBy ?? this.likedBy,
-      comments: comments ?? this.comments,
-      createdAt: createdAt,
-    );
-  }
-
   factory PostEntity.fromMap(Map<String, dynamic> map) {
+    final userMap = map['user'];
+    UserEntity user;
+
+    if (userMap != null && userMap is Map<String, dynamic>) {
+      user = UserEntity.fromMap(userMap);
+      print('Post user from map: ${user.name}');
+    } else {
+      print('User data is missing or invalid in post');
+      user = UserEntity(id: '', name: 'Unknown User', email: '');
+    }
+
     return PostEntity(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      imageUrl: map['imageUrl'] as String,
-      caption: map['caption'] as String,
+      id: map['id'] ?? '',
+      user: user,
+      imageUrl: map['imageUrl'] ?? '',
+      caption: map['caption'] ?? '',
       likedBy: List<String>.from(map['likedBy'] ?? []),
-      comments:
-          (map['comments'] as List<dynamic>?)
-              ?.map((comment) => CommentEntity.fromMap(comment))
-              .toList() ??
-          [],
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      comments: (map['comments'] as List<dynamic>? ?? [])
+          .map((e) => CommentEntity.fromMap(Map<String, dynamic>.from(e)))
+          .toList(),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'userId': userId,
+      'user': user.toMap(),
       'imageUrl': imageUrl,
       'caption': caption,
       'likedBy': likedBy,
-      'comments': comments.map((comment) => comment.toMap()).toList(),
-      'createdAt': Timestamp.fromDate(createdAt),
+      'comments': comments.map((e) => e.toMap()).toList(),
+      'createdAt': createdAt,
     };
   }
 }

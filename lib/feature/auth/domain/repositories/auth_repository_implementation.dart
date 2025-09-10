@@ -28,8 +28,9 @@ class AuthRepositoryImpl implements AuthRepository {
       if (token != null) {
         await tokenManager.saveToken(token);
         return UserEntity(
-          id: userCredential.user?.uid,
-          email: userCredential.user?.email,
+          id: userCredential.user!.uid,
+          email: userCredential.user!.email!,
+          name: '', // signIn sırasında name bilgisi yok, boş string
         );
       }
       throw Exception('Failed to get token');
@@ -60,8 +61,8 @@ class AuthRepositoryImpl implements AuthRepository {
       if (token != null) {
         await tokenManager.saveToken(token);
         return UserEntity(
-          id: userCredential.user?.uid,
-          email: userCredential.user?.email,
+          id: userCredential.user!.uid,
+          email: userCredential.user!.email!,
           name: name,
         );
       }
@@ -91,18 +92,16 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<bool> isSignedIn() async {
     try {
       final storedToken = tokenManager.getToken();
-      if (storedToken == null || storedToken.isEmpty) {
-        return false;
-      }
+      if (storedToken == null || storedToken.isEmpty) return false;
 
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
         await tokenManager.clearToken();
         return false;
       }
+
       try {
         final idTokenResult = await currentUser.getIdTokenResult(true);
-
         final isTokenValid =
             idTokenResult.token != null &&
             !idTokenResult.expirationTime!.isBefore(DateTime.now());
@@ -113,21 +112,15 @@ class AuthRepositoryImpl implements AuthRepository {
           return false;
         }
 
-        try {
-          await currentUser.reload();
-          final refreshedUser = _auth.currentUser;
+        await currentUser.reload();
+        final refreshedUser = _auth.currentUser;
 
-          if (refreshedUser == null) {
-            await tokenManager.clearToken();
-            return false;
-          }
-
-          return true;
-        } catch (e) {
+        if (refreshedUser == null) {
           await tokenManager.clearToken();
-          await _auth.signOut();
           return false;
         }
+
+        return true;
       } catch (e) {
         await tokenManager.clearToken();
         await _auth.signOut();
@@ -165,14 +158,41 @@ class AuthRepositoryImpl implements AuthRepository {
         await currentUser.reload();
         final updatedUser = _auth.currentUser;
 
+        // BU KISIM ÇOK ÖNEMLİ - userProfile doğru alınıyor mu?
         final userProfile = await userRepository.getUserProfile(
           updatedUser!.uid,
         );
 
+        print(
+          'Current Firebase User: ${updatedUser.uid}, ${updatedUser.email}',
+        );
+        print('User Profile from Firestore: ${userProfile?.name}');
+
+        // Eğer userProfile null geliyorsa, kullanıcıyı Firestore'a kaydet
+        if (userProfile == null) {
+          print('User profile not found, creating new profile...');
+          await userRepository.createUserProfile(
+            updatedUser.uid,
+            updatedUser.displayName ?? 'User',
+            updatedUser.email ?? '',
+          );
+
+          // Tekrar deneyelim
+          final newUserProfile = await userRepository.getUserProfile(
+            updatedUser.uid,
+          );
+
+          return UserEntity(
+            id: updatedUser.uid,
+            name: newUserProfile?.name ?? updatedUser.displayName ?? 'User',
+            email: updatedUser.email!,
+          );
+        }
+
         return UserEntity(
           id: updatedUser.uid,
-          name: userProfile?.name ?? updatedUser.displayName,
-          email: updatedUser.email,
+          name: userProfile.name, // BU SATIR ÇOK ÖNEMLİ
+          email: updatedUser.email!,
         );
       }
       return null;
@@ -191,10 +211,26 @@ class AuthRepositoryImpl implements AuthRepository {
 
         final userProfile = await userRepository.getUserProfile(user.uid);
 
+        // Eğer userProfile yoksa, oluştur
+        if (userProfile == null) {
+          await userRepository.createUserProfile(
+            user.uid,
+            user.displayName ?? 'User',
+            user.email ?? '',
+          );
+          final newProfile = await userRepository.getUserProfile(user.uid);
+
+          return UserEntity(
+            id: user.uid,
+            name: newProfile?.name ?? 'User',
+            email: user.email!,
+          );
+        }
+
         return UserEntity(
           id: user.uid,
-          name: userProfile?.name ?? user.displayName,
-          email: user.email,
+          name: userProfile.name,
+          email: user.email!,
         );
       } else {
         await tokenManager.clearToken();
@@ -227,16 +263,4 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception('Failed to send password reset email: $e');
     }
   }
-
-  // @override
-  // Future<void> sendEmailVerification() async {
-  //   try {
-  //     final user = _auth.currentUser;
-  //     if (user != null && !user.emailVerified) {
-  //       await user.sendEmailVerification();
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Failed to send email verification: $e');
-  //   }
-  // }
 }

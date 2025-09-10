@@ -1,34 +1,25 @@
-// CommentEntity with fromMap and toMap methods
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_challenge/feature/auth/domain/entities/user_entity.dart';
 
 class CommentEntity {
   final String id;
-  final String userId;
+  final UserEntity user;
   final String text;
-  final DateTime createdAt;
 
-  CommentEntity({
-    required this.id,
-    required this.userId,
-    required this.text,
-    required this.createdAt,
-  });
+  CommentEntity({required this.id, required this.user, required this.text});
 
   factory CommentEntity.fromMap(Map<String, dynamic> map) {
     return CommentEntity(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      text: map['text'] as String,
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      id: map['id'] ?? '',
+      text: map['text'] ?? '',
+      user: map['user'] != null
+          ? UserEntity.fromMap(Map<String, dynamic>.from(map['user']))
+          : UserEntity(id: '', name: 'Unknown', email: ''),
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'userId': userId,
-      'text': text,
-      'createdAt': Timestamp.fromDate(createdAt),
-    };
-  }
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'user': {'id': user.id, 'name': user.name, 'email': user.email},
+    'text': text,
+  };
 }
