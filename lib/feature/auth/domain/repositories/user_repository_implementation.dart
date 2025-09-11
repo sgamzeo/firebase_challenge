@@ -32,6 +32,18 @@ class UserRepositoryImpl implements UserRepository {
     );
   }
 
+  @override
+  Future<void> removeFcmToken(String userId, String fcmToken) {
+    // TODO: implement removeFcmToken
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveFcmToken(String userId, String fcmToken) {
+    // TODO: implement saveFcmToken
+    throw UnimplementedError();
+  }
+
   // @override
   // Future<void> deleteUserProfile(String uid) async {
   //   try {

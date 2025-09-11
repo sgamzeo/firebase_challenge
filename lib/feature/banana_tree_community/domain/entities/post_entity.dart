@@ -1,4 +1,3 @@
-// PostEntity with fromMap and toMap methods
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/comment_entity.dart';
 
@@ -39,17 +38,21 @@ class PostEntity {
 
   factory PostEntity.fromMap(Map<String, dynamic> map) {
     return PostEntity(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      imageUrl: map['imageUrl'] as String,
-      caption: map['caption'] as String,
+      id: map['id'] ?? '',
+      userId: map['userId'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
+      caption: map['caption'] ?? '',
       likedBy: List<String>.from(map['likedBy'] ?? []),
       comments:
           (map['comments'] as List<dynamic>?)
-              ?.map((comment) => CommentEntity.fromMap(comment))
+              ?.map((c) => CommentEntity.fromMap(Map<String, dynamic>.from(c)))
               .toList() ??
           [],
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      createdAt: map['createdAt'] is Timestamp
+          ? (map['createdAt'] as Timestamp).toDate()
+          : DateTime.parse(
+              map['createdAt'] ?? DateTime.now().toIso8601String(),
+            ),
     );
   }
 
@@ -60,7 +63,7 @@ class PostEntity {
       'imageUrl': imageUrl,
       'caption': caption,
       'likedBy': likedBy,
-      'comments': comments.map((comment) => comment.toMap()).toList(),
+      'comments': comments.map((c) => c.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

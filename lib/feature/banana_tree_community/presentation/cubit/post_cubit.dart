@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_challenge/feature/banana_tree_community/domain/entities/comment_entity.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/add_comment_use_case.dart';
 import 'package:firebase_challenge/feature/banana_tree_community/domain/usecases/remove_comment_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,8 +43,27 @@ class PostCubit extends Cubit<PostState> {
   Future<void> fetchPosts() async {
     try {
       emit(PostLoading());
+
       final posts = await getPostsUseCase();
-      emit(PostLoaded(posts));
+
+      // Her post için comments subcollection'ı çek
+      final postsWithComments = await Future.wait(
+        posts.map((post) async {
+          final commentSnapshot = await FirebaseFirestore.instance
+              .collection('posts')
+              .doc(post.id)
+              .collection('comments')
+              .get();
+
+          final comments = commentSnapshot.docs
+              .map((doc) => CommentEntity.fromMap(doc.data()))
+              .toList();
+
+          return post.copyWith(comments: comments);
+        }),
+      );
+
+      emit(PostLoaded(postsWithComments));
     } catch (e) {
       emit(PostError(e.toString()));
     }
@@ -112,10 +133,26 @@ class PostCubit extends Cubit<PostState> {
     String commentText,
   ) async {
     try {
-      await addCommentUseCase(post.id, userId, commentText);
+      final comment = CommentEntity(
+        id: const Uuid().v4(),
+        userId: userId,
+        text: commentText,
+        createdAt: DateTime.now(),
+        userName: '.',
+      );
+
+      // Firestore’a direkt ekleme
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(post.id)
+          .collection('comments')
+          .doc(comment.id)
+          .set(comment.toMap());
+
+      // Yorum eklenince postları tekrar fetch et
       await fetchPosts();
     } catch (e) {
-      emit(PostError(e.toString()));
+      emit(PostError('Error adding comment: $e'));
     }
   }
 
