@@ -13,8 +13,11 @@ class LocalNotificationService {
     const AndroidInitializationSettings androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
+
     const InitializationSettings settings = InitializationSettings(
       android: androidInit,
+      iOS: iosInit,
     );
 
     await _notifications.initialize(settings);
@@ -30,8 +33,11 @@ class LocalNotificationService {
           priority: Priority.high,
         );
 
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
+
     const NotificationDetails details = NotificationDetails(
       android: androidDetails,
+      iOS: iosDetails,
     );
 
     await _notifications.show(
