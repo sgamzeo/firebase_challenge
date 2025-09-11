@@ -18,10 +18,18 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  // 🔹 Crashlytics otomatik collection'u aç
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
+  // Flutter hata handler
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+  };
+
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;

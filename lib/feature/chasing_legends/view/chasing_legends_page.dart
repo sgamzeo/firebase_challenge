@@ -6,6 +6,7 @@ import '../cubit/mascot_cubit.dart';
 import 'package:firebase_challenge/core/dependency_injection.dart/dependecy_injection_container.dart'
     as di;
 import 'package:firebase_challenge/feature/auth/cubit/auth_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChasingLegendsPage extends StatelessWidget {
   const ChasingLegendsPage({super.key});
@@ -21,17 +22,18 @@ class ChasingLegendsPage extends StatelessWidget {
       }
     }
 
+    Future<void> downloadImage(String url) async {
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+      }
+    }
+
     return BlocProvider(
       create: (_) => di.getIt<MascotCubit>(),
       child: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, authState) {
-          // Auth state değişikliklerini dinle
-        },
+        listener: (context, authState) {},
         builder: (context, authState) {
           final cubit = context.read<MascotCubit>();
-          final authCubit = context.read<AuthCubit>();
-
-          // Kullanıcı ID'sini al
           String? userId;
           if (authState is AuthAuthenticated) {
             userId = authState.user.id;
@@ -52,6 +54,7 @@ class ChasingLegendsPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Üstte resim kutusu
                       GestureDetector(
                         onTap: () => pickImage(cubit),
                         child: Container(
@@ -64,9 +67,14 @@ class ChasingLegendsPage extends StatelessWidget {
                                     image: FileImage(selectedImage),
                                     fit: BoxFit.cover,
                                   )
+                                : downloadUrl != null
+                                ? DecorationImage(
+                                    image: NetworkImage(downloadUrl),
+                                    fit: BoxFit.cover,
+                                  )
                                 : null,
                           ),
-                          child: selectedImage == null
+                          child: selectedImage == null && downloadUrl == null
                               ? const Center(
                                   child: Icon(
                                     Icons.add_photo_alternate,
@@ -77,6 +85,8 @@ class ChasingLegendsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
+
+                      // Upload butonu
                       if (selectedImage != null && state is! MascotUploading)
                         ElevatedButton(
                           onPressed: userId == null
@@ -88,20 +98,26 @@ class ChasingLegendsPage extends StatelessWidget {
                                 ),
                           child: const Text('Upload Mascot'),
                         ),
+
                       if (state is MascotUploading)
                         const Center(child: CircularProgressIndicator()),
+
+                      // Download butonu
                       if (downloadUrl != null) ...[
                         const SizedBox(height: 24),
-                        Text(
-                          'Upload Successful!',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ElevatedButton(
+                          onPressed: () => downloadImage(downloadUrl!),
+                          child: const Text('Download Image'),
                         ),
                         const SizedBox(height: 8),
-                        Text('Download URL:'),
-                        SelectableText(downloadUrl),
-                      ],
-                      if (userId == null)
                         Text(
+                          'Upload Successful!',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+
+                      if (userId == null)
+                        const Text(
                           'Please sign in to upload mascots',
                           style: TextStyle(color: Colors.red),
                         ),
